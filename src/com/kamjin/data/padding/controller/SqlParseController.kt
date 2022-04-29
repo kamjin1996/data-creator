@@ -64,12 +64,12 @@ class SqlParseController : Controller() {
         }
 
         //order
-        orderTableMetadata(tableInfos)
+        val ordered = obtainOrderTableMetadata(tableInfos)
 
         //TODO 100 count
 
         //append sql and exec expressions by column metadata
-        for (tableMetadata in tableInfos) {
+        for (tableMetadata in ordered) {
             val sqls = (1..1000).map {
                 """insert into ${tableMetadata.name}( ${
                     tableMetadata.columnMetadatas.map { it.name }.joinToString(",")
@@ -116,10 +116,11 @@ class SqlParseController : Controller() {
         return beReferenceColumnValues[columnKey]
     }
 
-    private fun orderTableMetadata(tableMetadatas: ObservableList<TableMetadata>) {
-        tableMetadatas.sort()
-        tableMetadatas.forEach {
-            it.columnMetadatas.sort()
+    private fun obtainOrderTableMetadata(tableMetadatas: ObservableList<TableMetadata>): List<TableMetadata> {
+        return tableMetadatas.distinct().sorted().apply {
+            this.forEach {
+                it.columnMetadatas.sort()
+            }
         }
     }
 }
