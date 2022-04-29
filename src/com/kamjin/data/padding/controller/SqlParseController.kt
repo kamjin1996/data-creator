@@ -16,7 +16,7 @@ import java.lang.StringBuilder
  */
 class SqlParseController : Controller() {
 
-    val tableMetadataController = find<TableMetadataController>()
+    private val tableMetadataController = find<TableMetadataController>()
 
     /**
      * column expression saved cache
