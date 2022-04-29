@@ -10,9 +10,6 @@ import javafx.scene.*
 import javafx.scene.control.*
 import javafx.stage.*
 import javafx.util.*
-import main.kotlin.com.kamjin.data.padding.controller.*
-import main.kotlin.com.kamjin.data.padding.data.*
-import main.kotlin.com.kamjin.data.padding.model.*
 import tornadofx.*
 import java.util.*
 import javax.sql.*
