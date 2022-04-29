@@ -3,6 +3,8 @@ package com.kamjin.data.padding.view
 import java.time.*
 import java.time.format.*
 
+typealias InnerFun = (Maker,String?) -> String
+
 /**
  * <p>
  *

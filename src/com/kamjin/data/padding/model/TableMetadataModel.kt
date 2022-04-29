@@ -30,7 +30,7 @@ class ColumnMetadata(
     type: String,
     length: Int,
     comment: String?,
-) {
+) : Comparable<ColumnMetadata> {
 
     val tableNameProperty = SimpleStringProperty(tableName)
     var tableName by tableNameProperty
@@ -53,7 +53,7 @@ class ColumnMetadata(
     val ruleFunNameProperty = SimpleStringProperty()
     var ruleFunName by ruleFunNameProperty
 
-    val ruleFunProperty = SimpleObjectProperty<(String?) -> String>()
+    val ruleFunProperty = SimpleObjectProperty<(Maker, String?) -> String>()
     var ruleFun by ruleFunProperty
 
     val ruleFunParamProperty = SimpleStringProperty()
@@ -62,12 +62,28 @@ class ColumnMetadata(
     val otherTableColumnKeyProperty = SimpleStringProperty()
     var otherTableColumnKey by otherTableColumnKeyProperty
 
-    val customScriptFiltersProperty = SimpleListProperty<Pair<ScriptType, String>>(observableListOf())
+    val customScriptFiltersProperty = SimpleListProperty<ScriptInputItem>(observableListOf())
     var customScriptFilters by customScriptFiltersProperty
+
+    override fun compareTo(other: ColumnMetadata): Int {
+        if (this.needReferenceOtherColumn() && this.otherTableColumnKey == other.key) {
+            return -1
+        } else {
+            return 1
+        }
+    }
 
 }
 
-class TableMetadata(name: String, comment: String?, columnMetadatas: ObservableList<ColumnMetadata>) {
+fun ColumnMetadata.needReferenceOtherColumn(): Boolean {
+    return this.selectRule == ColumnConfigRoleEnum.withOtherTableColumn.name && this.otherTableColumnKey != null
+}
+
+val ColumnMetadata.key: String
+    get() = this.tableName + "." + this.name
+
+class TableMetadata(name: String, comment: String?, columnMetadatas: ObservableList<ColumnMetadata>) :
+    Comparable<TableMetadata> {
     val commentProperty = SimpleStringProperty(comment)
     var comment by commentProperty
 
@@ -76,5 +92,21 @@ class TableMetadata(name: String, comment: String?, columnMetadatas: ObservableL
 
     val columnMetadatasProperty = SimpleObjectProperty<ObservableList<ColumnMetadata>>(columnMetadatas)
     var columnMetadatas by columnMetadatasProperty
+
+    override fun compareTo(other: TableMetadata): Int {
+        //needReferenceKeys
+        val needReferenceKeys =
+            this.columnMetadatas.filter { it.needReferenceOtherColumn() }.map { it.otherTableColumnKey }
+
+        //otherTableKeys
+        val otherKeys = other.columnMetadatas.map { it.key }
+
+        //cul intersect list
+        if ((otherKeys intersect needReferenceKeys).isNotEmpty()) {
+            return 1
+        } else {
+            return -1
+        }
+    }
 
 }

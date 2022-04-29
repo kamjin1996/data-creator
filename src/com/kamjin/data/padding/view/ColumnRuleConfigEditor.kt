@@ -1,15 +1,20 @@
 package com.kamjin.data.padding.view
 
+import cn.hutool.db.ds.simple.*
 import com.kamjin.data.padding.controller.*
 import com.kamjin.data.padding.model.*
+import javafx.beans.property.*
+import javafx.collections.*
 import javafx.scene.*
 import javafx.scene.control.*
 import javafx.stage.*
 import javafx.util.*
 import tornadofx.*
 import java.util.*
-import kotlin.Pair
+import javax.sql.*
 import kotlin.properties.*
+import tornadofx.getValue
+import tornadofx.setValue
 
 /**
  * <p>
@@ -25,25 +30,25 @@ import kotlin.properties.*
  */
 class ColumnRuleConfigEditor : View() {
 
-    val sqlParseController = find<SqlParseController>()
+    private val sqlParseController = find<SqlParseController>()
 
-    val innerFunMap = mapOf<String, (String?) -> String>(
-        "autoId" to { Maker().autoId(it).toString() },
-        "choice" to { Maker.choice(it) },
-        "order" to { Maker().order(it).toString() },
-        "time" to { Maker().time(it).toString() }
+    private val innerFunMap = mapOf<String, InnerFun>(
+        "autoId" to { maker, param -> maker.autoId(param).toString() },
+        "choice" to { maker, param -> Maker.choice(param) },
+        "order" to { maker, param -> Maker().order(param).toString() },
+        "time" to { maker, param -> Maker().time(param).toString() }
     )
 
     lateinit var innerFunCheckBox: ComboBox<String>
 
-    val model: ColumnRuleConfigModel by inject()
+    private val model: ColumnRuleConfigModel by inject()
 
     private val selectRuleToggleGroup = ToggleGroup()
 
+    private val customCodeFilters: ObservableList<ScriptInputItem> = observableListOf()
+
     override val root = form {
-
         vbox(30) {
-
             //列信息区
             group {
                 text("列信息：")
@@ -57,39 +62,43 @@ class ColumnRuleConfigEditor : View() {
             }
 
             //规则选择 单选
-            text("规则：")
-            hbox(40) {
-                vbox {
-                    ColumnConfigRoleEnum.values().map {
-                        radiobutton(it.desc, selectRuleToggleGroup).action {
-                            model.selectedRule.set(it.name)
+            group {
+
+                //model rule
+                selectRuleToggleGroup.bind(model.selectedRule)
+
+                text("规则：")
+                hbox(40) {
+                    vbox {
+                        ColumnConfigRoleEnum.values().map {
+                            radiobutton(it.desc, selectRuleToggleGroup).action {
+                                model.selectedRule.set(it.name)
+                            }
+                        }
+                    }
+
+                    vbox {
+                        innerFunCheckBox = combobox(property = model.ruleFunName, values = innerFunMap.keys.toList()) {
+                            selectionModel.selectedItemProperty().addListener { obs, old, new ->
+                                model.ruleFunName.set(new)
+                                model.ruleFun.set(innerFunMap[new])
+                            }
                         }
                     }
                 }
 
-                vbox {
-                    innerFunCheckBox = combobox(property = model.ruleFunName, values = innerFunMap.keys.toList()) {
-                        selectionModel.selectedItemProperty().addListener { obs, old, new ->
-                            model.ruleFunName.set(new)
-                            model.ruleFun.set(innerFunMap[new])
+                //not innerFun selected dont show this
+                selectRuleToggleGroup.selectedToggleProperty().addListener { obs, old, new ->
+                    val toggleBean = new?.toggleGroupProperty()?.bean
+                    if (toggleBean != null && toggleBean is RadioButton) {
+
+                        with(innerFunCheckBox) {
+                            val innerFunSelected = (toggleBean.text == ColumnConfigRoleEnum.innerFun.name).toProperty()
+                            if (innerFunSelected.value) show() else hide()
                         }
                     }
                 }
             }
-            //model rule
-            selectRuleToggleGroup.bind(model.selectedRule)
-            //not innerFun selected dont show this
-            selectRuleToggleGroup.selectedToggleProperty().addListener { obs, old, new ->
-                val toggleBean = new?.toggleGroupProperty()?.bean
-                if (toggleBean != null && toggleBean is RadioButton) {
-
-                    with(innerFunCheckBox) {
-                        val innerFunSelected = (toggleBean.text == ColumnConfigRoleEnum.innerFun.name).toProperty()
-                        if (innerFunSelected.value) show() else hide()
-                    }
-                }
-            }
-
 
             //规则函数参数
             group {
@@ -122,18 +131,16 @@ class ColumnRuleConfigEditor : View() {
                         return@action
                     }
 
-                    var theScriptFilterPair: Pair<ScriptType, String>?
-                    var scriptType: ScriptType = ScriptType.UNKNOW
+                    val inputItem = ScriptInputItem()
+                    customCodeFilters.add(inputItem)
 
                     togglebutton {
-                        text = scriptType.name
                         val stateText = selectedProperty().stringBinding {
                             val s = if (it == true) ScriptType.JS else ScriptType.SQL
-                            scriptType = s
+                            inputItem.type = s
                             s.name
                         }
                         textProperty().bind(stateText)
-
                     }
 
                     //content
@@ -141,11 +148,8 @@ class ColumnRuleConfigEditor : View() {
                         textProperty().addListener { obs, old, new ->
                             println("自定义过滤器 You typed: " + new)
                         }
-                    }.setOnInputMethodTextChanged {
-                        if (scriptType != ScriptType.UNKNOW) {
-                            theScriptFilterPair = scriptType to it.committed
-                            model.customScriptFilters.add(theScriptFilterPair)
-                        }
+
+                        textProperty().bind(inputItem.scriptProperty)
                     }
                 }
             }
@@ -159,34 +163,57 @@ class ColumnRuleConfigEditor : View() {
                 enableWhen(model.dirty)
                 action {
                     model.commit {
-                        //create expression
-                        val key = model.tableName + "." + model.columnName
+                        //save customScriptFilters
+                        model.customScriptFilters.addAll(customCodeFilters)
+
+                        //column key
+                        val key = model.item.key
 
                         //create expression by role type
-                        val es = when (ColumnConfigRoleEnum.valueOf(model.selectedRule.get())) {
-                            ColumnConfigRoleEnum.doNoting -> listOf(NothingExpression())
-                            ColumnConfigRoleEnum.withOtherTableColumn -> listOf(OtherTableColumnExpression(model.otherTableColumnKey.get()))
-                            ColumnConfigRoleEnum.innerFun -> listOf(
-                                InnerFunExpression(
-                                    model.ruleFun.get(),
-                                    model.ruleFunParam.get()
-                                )
-                            )
-                            ColumnConfigRoleEnum.custom -> model.customScriptFilters.map {
-                                when (it.first) {
-                                    ScriptType.UNKNOW -> NothingExpression()
-                                    ScriptType.SQL -> SqlCodeExpression(it.second)
-                                    ScriptType.JS -> JsCodeExpression(it.second)
-                                }
-                            }
-                        }
-                        sqlParseController.putColumnRuleExpressions(key.get(), es)
+                        val expression = createExpressionsByRoleType()
+                        sqlParseController.putColumnRuleExpression(key, expression)
                     }
                 }
             }
         }
-
     }
+
+    /**
+     * create expressions role type
+     */
+    private fun createExpressionsByRoleType(): ColumnRuleExpression {
+        return when (ColumnConfigRoleEnum.valueOf(model.selectedRule.get())) {
+            ColumnConfigRoleEnum.doNoting -> NothingExpression()
+            ColumnConfigRoleEnum.withOtherTableColumn -> OtherTableColumnExpression(model.otherTableColumnKey.get())
+            ColumnConfigRoleEnum.innerFun -> InnerFunExpression(model.ruleFun.get(), model.ruleFunParam.get())
+            ColumnConfigRoleEnum.custom -> model.customScriptFilters.map {
+                val filters = when (it.type!!) {
+                    ScriptType.UNKNOW -> NothingExpression()
+                    ScriptType.SQL -> SqlCodeExpression(it.script)
+                    ScriptType.JS -> JsCodeExpression(it.script)
+                }
+                return@map filters
+            }.apply {
+                //set all next filter
+                val iterator = this.iterator()
+                while (iterator.hasNext()) {
+                    val next = iterator.next()
+                    if (iterator.hasNext()) {
+                        next.setNext(iterator.next())
+                    }
+                }
+            }.first()
+        }
+    }
+}
+
+class ScriptInputItem {
+
+    val typeProperty = SimpleObjectProperty<ScriptType>()
+    var type by typeProperty
+
+    val scriptProperty = SimpleStringProperty()
+    var script by scriptProperty
 }
 
 enum class ScriptType {
