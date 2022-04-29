@@ -1,9 +1,9 @@
-package com.kamjin.data.padding.view
+package main.kotlin.com.kamjin.data.padding.data
 
 import java.time.*
 import java.time.format.*
 
-typealias InnerFun = (Maker,String?) -> String
+typealias InnerFun = (Maker, String?) -> String
 
 /**
  * <p>

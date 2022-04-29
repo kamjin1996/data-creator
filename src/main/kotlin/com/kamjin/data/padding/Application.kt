@@ -1,6 +1,6 @@
-package com.kamjin.data.padding
+package main.kotlin.com.kamjin.data.padding
 
-import com.kamjin.data.padding.view.*
+import main.kotlin.com.kamjin.data.padding.view.*
 import tornadofx.*
 
 /**

@@ -1,8 +1,9 @@
-package com.kamjin.data.padding.model
+package main.kotlin.com.kamjin.data.padding.model
 
-import com.kamjin.data.padding.view.*
 import javafx.beans.property.*
 import javafx.collections.*
+import main.kotlin.com.kamjin.data.padding.data.*
+import main.kotlin.com.kamjin.data.padding.view.*
 import tornadofx.*
 import tornadofx.getValue
 import tornadofx.setValue

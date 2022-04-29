@@ -1,4 +1,4 @@
-package com.kamjin.data.padding.view
+package main.kotlin.com.kamjin.data.padding.view
 
 import cn.hutool.db.ds.simple.*
 import javafx.beans.property.*
