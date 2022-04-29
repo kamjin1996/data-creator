@@ -14,7 +14,6 @@
         <tornado.version>1.7.20</tornado.version>
         <kotlin.version>1.6.10</kotlin.version>
         <hutool.version>5.0.6</hutool.version>
-        <openjfx.version>11.0.2</openjfx.version>
     </properties>
 
     <dependencyManagement>
@@ -23,23 +22,6 @@
                 <groupId>no.tornado</groupId>
                 <artifactId>tornadofx</artifactId>
                 <version>${tornado.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx</artifactId>
-                <type>pom</type>
-                <version>${openjfx.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-base</artifactId>
-                <version>${openjfx.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-controls</artifactId>
-                <version>${openjfx.version}</version>
             </dependency>
 
             <dependency>
@@ -62,15 +44,6 @@
         <dependency>
             <groupId>no.tornado</groupId>
             <artifactId>tornadofx</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-base</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
         </dependency>
 
         <dependency>
@@ -114,25 +87,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <jvmTarget>11</jvmTarget>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.3</version>
-                <configuration>
-                    <mainClass>MyMainApp</mainClass>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
-                <configuration>
-                    <release>11</release>
+                    <jvmTarget>1.8</jvmTarget>
                 </configuration>
             </plugin>
         </plugins>
