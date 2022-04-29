@@ -1,9 +1,9 @@
-package main.kotlin.com.kamjin.data.padding.view;
+package com.kamjin.data.padding.view;
 
 import cn.hutool.core.io.*
+import com.kamjin.data.padding.controller.*
 import javafx.scene.control.*
 import javafx.stage.*
-import main.kotlin.com.kamjin.data.padding.controller.*
 import tornadofx.*
 import java.nio.charset.*
 

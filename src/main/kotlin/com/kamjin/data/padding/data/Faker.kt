@@ -1,4 +1,4 @@
-package main.kotlin.com.kamjin.data.padding.data
+package com.kamjin.data.padding.data
 
 import java.time.*
 import java.time.format.*

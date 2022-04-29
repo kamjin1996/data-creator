@@ -1,6 +1,9 @@
-package main.kotlin.com.kamjin.data.padding.view
+package com.kamjin.data.padding.view
 
 import cn.hutool.db.ds.simple.*
+import com.kamjin.data.padding.controller.*
+import com.kamjin.data.padding.data.*
+import com.kamjin.data.padding.model.*
 import javafx.beans.property.*
 import javafx.collections.*
 import javafx.scene.*

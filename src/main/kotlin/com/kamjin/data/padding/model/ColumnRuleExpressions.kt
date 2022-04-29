@@ -1,12 +1,12 @@
-package main.kotlin.com.kamjin.data.padding.model
+package com.kamjin.data.padding.model
 
 import cn.hutool.db.*
 import cn.hutool.script.*
+import com.kamjin.data.padding.controller.*
+import com.kamjin.data.padding.data.*
+import com.kamjin.data.padding.view.*
 import javafx.application.*
 import javafx.scene.control.*
-import main.kotlin.com.kamjin.data.padding.controller.*
-import main.kotlin.com.kamjin.data.padding.data.*
-import main.kotlin.com.kamjin.data.padding.view.*
 import tornadofx.*
 import tornadofx.FX.Companion.find
 import java.util.*

@@ -1,4 +1,4 @@
-package main.kotlin.com.kamjin.data.padding.model
+package com.kamjin.data.padding.model
 
 import tornadofx.*
 
