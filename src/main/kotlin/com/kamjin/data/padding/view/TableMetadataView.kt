@@ -21,7 +21,7 @@ class TableMetadataView : View() {
 
     private val tableMetadataController = find(TableMetadataController::class)
 
-    val model: ColumnRuleConfigModel by inject()
+    val model: ColumnRuleConfig by inject()
 
     override val root = vbox {
         tableview(tableMetadataController.queryAllTableInfos()) {

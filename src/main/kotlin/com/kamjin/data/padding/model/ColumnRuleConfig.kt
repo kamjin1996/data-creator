@@ -14,7 +14,7 @@ import tornadofx.*
 /**
  * 列规则配置
  */
-class ColumnRuleConfigModel : ItemViewModel<ColumnMetadata>() {
+class ColumnRuleConfig : ItemViewModel<ColumnMetadata>() {
 
     val columnName = bind(ColumnMetadata::nameProperty)
 

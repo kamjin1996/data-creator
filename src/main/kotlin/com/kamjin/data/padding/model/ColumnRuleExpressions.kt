@@ -9,6 +9,7 @@ import javafx.application.*
 import javafx.scene.control.*
 import tornadofx.*
 import tornadofx.FX.Companion.find
+import java.io.Serializable
 import java.util.*
 import javax.sql.*
 
@@ -20,6 +21,7 @@ import javax.sql.*
  * @author kam
  * @since 2022/04/28
  */
+
 interface ColumnRuleExpression {
 
     /**
@@ -173,6 +175,34 @@ class SqlCodeExpression(var sql: String) :
 
         }
         return DbUtil.use(dataSource).queryString(sql, lastResult)
+    }
+}
+
+/**
+ * create expressions role type
+ */
+fun createExpressionsByRoleType(model: ColumnMetadata): ColumnRuleExpression? {
+    return when (ColumnConfigRoleEnum.valueOf(model.selectRule ?: return null )) {
+        ColumnConfigRoleEnum.doNoting -> NothingExpression()
+        ColumnConfigRoleEnum.withOtherTableColumn -> OtherTableColumnExpression(model.otherTableColumnKey)
+        ColumnConfigRoleEnum.innerFun -> InnerFunExpression(model.ruleFun, model.ruleFunParam)
+        ColumnConfigRoleEnum.custom -> model.customScriptFilters.map {
+            val filters = when (it.type!!) {
+                ScriptType.UNKNOW -> NothingExpression()
+                ScriptType.SQL -> SqlCodeExpression(it.script)
+                ScriptType.JS -> JsCodeExpression(it.script)
+            }
+            return@map filters
+        }.apply {
+            //set all next filter
+            val iterator = this.iterator()
+            while (iterator.hasNext()) {
+                val next = iterator.next()
+                if (iterator.hasNext()) {
+                    next.setNext(iterator.next())
+                }
+            }
+        }.first()
     }
 }
 

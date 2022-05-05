@@ -3,6 +3,10 @@ package com.kamjin.data.padding.controller
 import com.kamjin.data.padding.model.*
 import javafx.collections.*
 import tornadofx.*
+import java.io.*
+import java.nio.file.*
+import javax.json.*
+import kotlin.concurrent.*
 
 /**
  * <p>
@@ -13,12 +17,11 @@ import tornadofx.*
  * @since 2022/04/27
  */
 class TableMetadataController : Controller() {
-
     /**
      * TODO 数据源
      * 从字段解析而来
      */
-    val tableInfos: ObservableList<TableMetadata> = listOf(
+    var tableInfos: ObservableList<TableMetadata> = listOf(
         TableMetadata(
             "employee", "员工", listOf(
                 ColumnMetadata("employee", "id", DbColumnType.bigint.name, 20, "主键ID"),
@@ -36,6 +39,44 @@ class TableMetadataController : Controller() {
             ).toObservable()
         )
     ).toObservable()
+
+
+    init {
+        val key = "tableInfos"
+
+        var paths = mutableListOf<Path>()
+
+        val parentFileDir = File("./$key")
+            .apply {
+                if (!this.exists()) {
+                    this.mkdirs()
+                } else {
+                    if (!this.isDirectory) {
+                        throw FileAlreadyExistsException("the path:$this not dir")
+                    }
+
+                    paths = this.listFiles().map { it.toPath() }.toMutableList()
+                }
+            }
+
+        try {
+            paths.forEach {
+                tableInfos.add(loadJsonModel<TableMetadata>(it))
+            }
+        } catch (e: JsonException) {
+            println(e)
+        }
+
+        //five sec save the data to local
+        fixedRateTimer("Preferences save1", daemon = true, period = 5000) {
+            tableInfos.forEach {
+                val newFilePath = parentFileDir.path + "/" + it.name
+                it.save(File(newFilePath).toPath())
+                println("save---$newFilePath")
+            }
+        }
+    }
+
 
     /**
      * 查询所有表元数据信息

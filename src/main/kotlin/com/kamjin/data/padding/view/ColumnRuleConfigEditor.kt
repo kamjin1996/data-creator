@@ -42,7 +42,7 @@ class ColumnRuleConfigEditor : View() {
 
     lateinit var innerFunCheckBox: ComboBox<String>
 
-    private val model: ColumnRuleConfigModel by inject()
+    private val model: ColumnRuleConfig by inject()
 
     private val selectRuleToggleGroup = ToggleGroup()
 
@@ -171,44 +171,19 @@ class ColumnRuleConfigEditor : View() {
                         val key = model.item.key
 
                         //create expression by role type
-                        val expression = createExpressionsByRoleType()
-                        sqlParseController.putColumnRuleExpression(key, expression)
+                        val expression = createExpressionsByRoleType(model.item)
+                        if (expression != null) {
+                            sqlParseController.putColumnRuleExpression(key, expression)
+                        }
                     }
                 }
             }
         }
     }
-
-    /**
-     * create expressions role type
-     */
-    private fun createExpressionsByRoleType(): ColumnRuleExpression {
-        return when (ColumnConfigRoleEnum.valueOf(model.selectedRule.get())) {
-            ColumnConfigRoleEnum.doNoting -> NothingExpression()
-            ColumnConfigRoleEnum.withOtherTableColumn -> OtherTableColumnExpression(model.otherTableColumnKey.get())
-            ColumnConfigRoleEnum.innerFun -> InnerFunExpression(model.ruleFun.get(), model.ruleFunParam.get())
-            ColumnConfigRoleEnum.custom -> model.customScriptFilters.map {
-                val filters = when (it.type!!) {
-                    ScriptType.UNKNOW -> NothingExpression()
-                    ScriptType.SQL -> SqlCodeExpression(it.script)
-                    ScriptType.JS -> JsCodeExpression(it.script)
-                }
-                return@map filters
-            }.apply {
-                //set all next filter
-                val iterator = this.iterator()
-                while (iterator.hasNext()) {
-                    val next = iterator.next()
-                    if (iterator.hasNext()) {
-                        next.setNext(iterator.next())
-                    }
-                }
-            }.first()
-        }
-    }
 }
 
-class ScriptInputItem {
+
+class ScriptInputItem : JsonModelAuto {
 
     val typeProperty = SimpleObjectProperty<ScriptType>()
     var type by typeProperty

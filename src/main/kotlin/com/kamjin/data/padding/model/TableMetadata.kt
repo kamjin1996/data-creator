@@ -26,12 +26,12 @@ enum class DbColumnType {
 }
 
 class ColumnMetadata(
-    tableName: String?,
-    name: String,
-    type: String,
-    length: Int,
-    comment: String?,
-) : Comparable<ColumnMetadata> {
+    tableName: String? = null,
+    name: String = "",
+    type: String = "",
+    length: Int = 0,
+    comment: String? = null,
+) : Comparable<ColumnMetadata>, JsonModelAuto {
 
     val tableNameProperty = SimpleStringProperty(tableName)
     var tableName by tableNameProperty
@@ -54,7 +54,7 @@ class ColumnMetadata(
     val ruleFunNameProperty = SimpleStringProperty()
     var ruleFunName by ruleFunNameProperty
 
-    val ruleFunProperty = SimpleObjectProperty<(Maker, String?) -> String>()
+    val ruleFunProperty = SimpleObjectProperty<InnerFun>()
     var ruleFun by ruleFunProperty
 
     val ruleFunParamProperty = SimpleStringProperty()
@@ -83,15 +83,20 @@ fun ColumnMetadata.needReferenceOtherColumn(): Boolean {
 val ColumnMetadata.key: String
     get() = this.tableName + "." + this.name
 
-class TableMetadata(name: String, comment: String?, columnMetadatas: ObservableList<ColumnMetadata>) :
-    Comparable<TableMetadata> {
+class TableMetadata(
+    name: String = "",
+    comment: String? = null,
+    columnMetadata: ObservableList<ColumnMetadata> = observableListOf()
+) :
+    Comparable<TableMetadata>, JsonModelAuto {
+
     val commentProperty = SimpleStringProperty(comment)
     var comment by commentProperty
 
     val nameProperty = SimpleStringProperty(name)
     var name by nameProperty
 
-    val columnMetadatasProperty = SimpleObjectProperty<ObservableList<ColumnMetadata>>(columnMetadatas)
+    val columnMetadatasProperty = SimpleObjectProperty<ObservableList<ColumnMetadata>>(columnMetadata)
     var columnMetadatas by columnMetadatasProperty
 
     override fun compareTo(other: TableMetadata): Int {
@@ -109,5 +114,6 @@ class TableMetadata(name: String, comment: String?, columnMetadatas: ObservableL
             return -1
         }
     }
+
 
 }

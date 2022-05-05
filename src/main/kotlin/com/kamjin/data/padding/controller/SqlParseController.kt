@@ -16,13 +16,21 @@ import java.lang.StringBuilder
  */
 class SqlParseController : Controller() {
 
-    private val tableMetadataController = find<TableMetadataController>()
-
     /**
      * column expression saved cache
      * key: table.column
      */
     private var columnExpressionMap = mutableMapOf<String, ColumnRuleExpression>()
+
+    private val tableMetadataController = find<TableMetadataController>()
+
+    init {
+        tableMetadataController.queryAllTableInfos().flatMap { it.columnMetadatas }
+            .fold(columnExpressionMap) { acc, c ->
+                createExpressionsByRoleType(c)?.let { acc.put(c.key, it) }
+                acc
+            }
+    }
 
     //be referenced the other column
     //key: table.column
@@ -116,8 +124,8 @@ class SqlParseController : Controller() {
         return beReferenceColumnValues[columnKey]
     }
 
-    private fun obtainOrderTableMetadata(tableMetadatas: ObservableList<TableMetadata>): List<TableMetadata> {
-        return tableMetadatas.distinct().sorted().apply {
+    private fun obtainOrderTableMetadata(tableMetadata: ObservableList<TableMetadata>): List<TableMetadata> {
+        return tableMetadata.distinct().sorted().apply {
             this.forEach {
                 it.columnMetadatas.sort()
             }
