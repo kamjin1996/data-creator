@@ -33,25 +33,25 @@ class DataSourceConfigView() : View() {
         hbox(20) {
             fieldset("Database Config") {
                 vbox {
-                    field("url: ") { textfield {}.bind(model.urlProperty) }
-                    field("user: ") { textfield { }.bind(model.userProperty) }
-                    field("password: ") { passwordfield { }.bind(model.passwordProperty) }
+                    field("Url: ") { textfield {}.bind(model.urlProperty) }
+                    field("User: ") { textfield { }.bind(model.userProperty) }
+                    field("Password: ") { passwordfield { }.bind(model.passwordProperty) }
                 }
             }
         }
 
         buttonbar {
-            button("reset").action {
+            button("Reset").action {
                 model.clear()
             }
 
-            button("testConnect").action {
+            button("TestConnect").action {
                 val simpleDataSource = SimpleDataSource(model.url, model.user, model.password)
                 val valid = simpleDataSource.connection.isValid(3000)
                 alert(type = Alert.AlertType.INFORMATION, _alertHeader, content = valid.toString())
             }
 
-            button("save").action {
+            button("Save").action {
                 _dataSource = SimpleDataSource(model.url, model.user, model.password)
                 val valid = _dataSource?.connection?.isValid(3000)
                 if (valid == false) {
@@ -121,10 +121,10 @@ class DataSourceStatusView : View() {
     private val _dataSource by find<DataSourceConfigView>().obtainDataSource().toProperty()
 
     override val root = vbox(20) {
-        text("connect status: ${_dataSource != null}")
-        text("schema: ${_dataSource?.connection?.catalog}")
-        text("url: ${_dataSource?.connection?.metaData?.url}")
-        text("user: ${_dataSource?.connection?.metaData?.userName}")
+        text("Connect Status: ${_dataSource != null}")
+        text("Schema: ${_dataSource?.connection?.catalog}")
+        text("Url: ${_dataSource?.connection?.metaData?.url}")
+        text("User: ${_dataSource?.connection?.metaData?.userName}")
     }
 }
 
