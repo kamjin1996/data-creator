@@ -9,7 +9,6 @@ import tornadofx.*
 import java.io.*
 import java.nio.file.*
 import javax.json.*
-import javax.sql.*
 import kotlin.concurrent.*
 
 /**
@@ -70,7 +69,7 @@ class TableMetadataController : Controller() {
                 tableInfos.add(model)
             }
         } catch (e: JsonException) {
-            println(e)
+            log.warning(e.printStackTrace().toString())
         }
 
         //five sec save the data to local
@@ -78,7 +77,7 @@ class TableMetadataController : Controller() {
             tableInfos.forEach {
                 val newFilePath = parentFileDir.path + "/" + it.name + ".dat"
                 it.save(File(newFilePath).toPath())
-                println("save---$newFilePath")
+                log.info("save---$newFilePath")
             }
         }
     }
@@ -92,8 +91,8 @@ class TableMetadataController : Controller() {
     }
 
     fun queryTableBaseInfos(): List<TableBaseInfo> {
-        val dataSource = find<DataSourceConfigView>().obtainDataSource() ?: return mutableListOf()
-        return Db.use()
+        val dataSource = find<DataSourceConfigView>().obtainDataSourceWithTip() ?: return mutableListOf()
+        return Db.use(dataSource)
             .query("select table_comment,table_name from information_schema.tables where table_schema = '${dataSource.connection?.catalog}'")
             .map { TableBaseInfo(it.getStr("table_name"), it.getStr("table_comment")) }
     }

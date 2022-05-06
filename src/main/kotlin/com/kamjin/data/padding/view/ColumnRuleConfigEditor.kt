@@ -104,7 +104,8 @@ class ColumnRuleConfigEditor : View() {
 
                     tooltip = Tooltip("rule method params,eg:['a','b','c']")
                     textProperty().addListener { obs, old, new ->
-                        println("规则函数参数 You typed: " + new)
+                        log.info("规则函数参数 You typed: $new")
+
                         model.ruleFunParam.set(new)
                         if (model.selectedRule.get() == ColumnConfigRoleEnum.withOtherTableColumn.name) {
                             model.otherTableColumnKey.set(new)
@@ -141,7 +142,7 @@ class ColumnRuleConfigEditor : View() {
                     //content
                     textfield {
                         textProperty().addListener { obs, old, new ->
-                            println("自定义过滤器 You typed: " + new)
+                            log.info("自定义过滤器 You typed: " + new)
                         }
 
                         textProperty().bind(inputItem.scriptProperty)

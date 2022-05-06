@@ -9,7 +9,6 @@ import javafx.application.*
 import javafx.scene.control.*
 import tornadofx.*
 import tornadofx.FX.Companion.find
-import java.io.Serializable
 import java.util.*
 import javax.sql.*
 
@@ -156,7 +155,7 @@ class SqlCodeExpression(var sql: String) :
     ColumnRuleExpression, ValueFilter, AbstractChainFilter<Any>() {
 
     private val dataSource: DataSource?
-        get() = find<DataSourceConfigView>().obtainDataSource()
+        get() = find<DataSourceConfigView>().obtainDataSourceWithTip()
 
     override fun exec(): String {
         return filter(null).toString()

@@ -35,7 +35,7 @@ object TableMetadataHandler {
 
         //parse
         return useTableBaseInfos.map { tableInfo ->
-            val dataSource = find<DataSourceConfigView>().obtainDataSource()
+            val dataSource = find<DataSourceConfigView>().obtainDataSourceWithTip()
             TableMetadata().apply {
                 this.name = tableInfo.tableName
                 this.comment = tableInfo.tableComment

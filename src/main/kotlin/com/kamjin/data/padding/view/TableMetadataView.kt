@@ -38,7 +38,7 @@ class TableMetadataView : View() {
                     bindSelected(model)
 
                     selectionModel.selectedItemProperty().onChange {
-                        println("change ${it?.name}")
+                        log.info("change ${it?.name}")
                     }
                 }
             }

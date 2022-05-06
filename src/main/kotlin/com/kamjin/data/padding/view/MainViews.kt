@@ -58,8 +58,15 @@ class TopView : View() {
 
         menubar {
             menu("数据源") {
-                item("新建连接").action {
-                    openInternalWindow<DataSourceConfigView>()
+                item("当前信息") {
+                    action {
+                        find<DataSourceStatusView>().openWindow()
+                    }
+                }
+                item("新建连接") {
+                    action {
+                        openInternalWindow<DataSourceConfigView>()
+                    }
                 }
             }
         }
