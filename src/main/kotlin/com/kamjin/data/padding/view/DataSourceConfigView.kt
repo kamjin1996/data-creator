@@ -19,7 +19,22 @@ import tornadofx.setValue
  */
 class DataSourceConfigView() : View() {
 
-    var dataSource: DataSource? = null
+    private var dataSource: DataSource? = null
+
+    fun obtainDataSource(): DataSource? {
+        return dataSource.also {
+            fun checkMe(dataSource: DataSource?) {
+                if (dataSource == null || !dataSource.connection.isValid(5000)) {
+                    alert(
+                        Alert.AlertType.WARNING,
+                        header = "datasource connect error",
+                        content = "please config datasource on setting"
+                    )
+                }
+            }
+            checkMe(it)
+        }
+    }
 
     private var model = DataSourceViewModel()
 

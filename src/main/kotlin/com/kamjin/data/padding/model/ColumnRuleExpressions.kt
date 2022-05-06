@@ -156,7 +156,7 @@ class SqlCodeExpression(var sql: String) :
     ColumnRuleExpression, ValueFilter, AbstractChainFilter<Any>() {
 
     private val dataSource: DataSource?
-        get() = find<DataSourceConfigView>().dataSource
+        get() = find<DataSourceConfigView>().obtainDataSource()
 
     override fun exec(): String {
         return filter(null).toString()

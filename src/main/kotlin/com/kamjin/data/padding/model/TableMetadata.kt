@@ -29,7 +29,7 @@ class ColumnMetadata(
     tableName: String? = null,
     name: String = String.EMPTY,
     type: String = String.EMPTY,
-    length: Int = 0,
+    length: Int? = null,
     comment: String? = null,
 ) : Comparable<ColumnMetadata>, JsonModelAuto {
 
@@ -39,7 +39,7 @@ class ColumnMetadata(
     val commentProperty = SimpleStringProperty(comment)
     var comment by commentProperty
 
-    val lengthProperty = SimpleIntegerProperty(length)
+    val lengthProperty = SimpleIntegerProperty(length ?: 0)
     var length by lengthProperty
 
     val typeProperty = SimpleStringProperty(type)

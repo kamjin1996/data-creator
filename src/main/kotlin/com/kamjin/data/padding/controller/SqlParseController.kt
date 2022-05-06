@@ -2,6 +2,7 @@ package com.kamjin.data.padding.controller
 
 import com.kamjin.data.padding.data.*
 import com.kamjin.data.padding.model.*
+import com.kamjin.data.padding.view.*
 import javafx.collections.*
 import tornadofx.*
 import java.lang.StringBuilder
@@ -79,11 +80,16 @@ class SqlParseController : Controller() {
 
         //append sql and exec expressions by column metadata
         for (tableMetadata in ordered) {
+            val useColumnMetadata =
+                tableMetadata.columnMetadatas.filterNot { it.selectRule == null || it.selectRule == ColumnConfigRoleEnum.doNoting.name }
+
+            if (useColumnMetadata.isEmpty()) continue //the table not have config
+
             val sqls = (1..1000).map {
                 """insert into ${tableMetadata.name}( ${
-                    tableMetadata.columnMetadatas.map { it.name }.joinToString(",")
+                    useColumnMetadata.map { it.name }.joinToString(",")
                 } ) values ( ${
-                    tableMetadata.columnMetadatas.map {
+                    useColumnMetadata.map {
                         val key = it.key
                         val expression = columnExpressionMap[key]
                         val result =

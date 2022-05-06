@@ -42,7 +42,9 @@ class TopView : View() {
         //导出为导出插入数据sql
         menubar {
             menu("文件操作") {
-                item("导入")
+                item("导入").action {
+                    openInternalWindow<TableMetadataImportView>()
+                }
                 item("导出").action {
                     //covert to sql
                     //progress show

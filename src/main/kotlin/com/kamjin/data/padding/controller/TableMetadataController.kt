@@ -1,11 +1,15 @@
 package com.kamjin.data.padding.controller
 
+import cn.hutool.db.*
+import com.kamjin.data.padding.data.*
 import com.kamjin.data.padding.model.*
+import com.kamjin.data.padding.view.*
 import javafx.collections.*
 import tornadofx.*
 import java.io.*
 import java.nio.file.*
 import javax.json.*
+import javax.sql.*
 import kotlin.concurrent.*
 
 /**
@@ -79,12 +83,18 @@ class TableMetadataController : Controller() {
         }
     }
 
-
     /**
      * 查询所有表元数据信息
      *
      */
     fun queryAllTableInfos(): ObservableList<TableMetadata> {
         return tableInfos
+    }
+
+    fun queryTableBaseInfos(): List<TableBaseInfo> {
+        val dataSource = find<DataSourceConfigView>().obtainDataSource() ?: return mutableListOf()
+        return Db.use()
+            .query("select table_comment,table_name from information_schema.tables where table_schema = '${dataSource.connection?.catalog}'")
+            .map { TableBaseInfo(it.getStr("table_name"), it.getStr("table_comment")) }
     }
 }
