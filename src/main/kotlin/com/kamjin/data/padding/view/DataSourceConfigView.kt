@@ -4,6 +4,8 @@ import cn.hutool.db.ds.simple.*
 import com.kamjin.data.padding.data.*
 import javafx.beans.property.*
 import javafx.scene.control.*
+import javafx.scene.paint.*
+import javafx.scene.text.*
 import tornadofx.*
 import javax.sql.*
 import tornadofx.getValue
@@ -121,10 +123,24 @@ class DataSourceStatusView : View() {
     private val _dataSource by find<DataSourceConfigView>().obtainDataSource().toProperty()
 
     override val root = vbox(20) {
-        text("Connect Status: ${_dataSource != null}")
-        text("Schema: ${_dataSource?.connection?.catalog}")
-        text("Url: ${_dataSource?.connection?.metaData?.url}")
-        text("User: ${_dataSource?.connection?.metaData?.userName}")
+        //TODO css control style
+
+        textflow {
+            text("Connect Status:")
+            text("${_dataSource != null}")
+        }
+        textflow {
+            text("Schema: ")
+            text("${_dataSource?.connection?.catalog}")
+        }
+        textflow {
+            text("Url: ")
+            text("${_dataSource?.connection?.metaData?.url}")
+        }
+        textflow {
+            text("User: ")
+            text("${_dataSource?.connection?.metaData?.userName}")
+        }
     }
 }
 
