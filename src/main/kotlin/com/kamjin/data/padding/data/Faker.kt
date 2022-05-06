@@ -36,7 +36,7 @@ class Maker {
         if (ins == null) {
             ins = param?.split(",")?.iterator()
         }
-        return ins?.next() ?: ""
+        return ins?.next() ?: String.EMPTY
     }
 
     /**
@@ -70,4 +70,5 @@ class Maker {
     }
 }
 
-
+val String.Companion.EMPTY: String
+    get() = ""

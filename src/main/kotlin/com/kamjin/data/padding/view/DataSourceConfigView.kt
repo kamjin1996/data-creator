@@ -1,6 +1,7 @@
 package com.kamjin.data.padding.view
 
 import cn.hutool.db.ds.simple.*
+import com.kamjin.data.padding.data.*
 import javafx.beans.property.*
 import javafx.scene.control.*
 import tornadofx.*
@@ -67,8 +68,8 @@ class DataSourceViewModel {
     var password by passwordProperty
 
     fun clear() {
-        this.urlProperty.set("")
-        this.userProperty.set("")
-        this.passwordProperty.set("")
+        this.urlProperty.set(String.EMPTY)
+        this.userProperty.set(String.EMPTY)
+        this.passwordProperty.set(String.EMPTY)
     }
 }

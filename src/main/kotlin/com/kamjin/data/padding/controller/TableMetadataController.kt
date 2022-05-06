@@ -21,7 +21,7 @@ class TableMetadataController : Controller() {
      * TODO 数据源
      * 从字段解析而来
      */
-    var tableInfos: ObservableList<TableMetadata> = listOf(
+    /*var tableInfos: ObservableList<TableMetadata> = listOf(
         TableMetadata(
             "employee", "员工", listOf(
                 ColumnMetadata("employee", "id", DbColumnType.bigint.name, 20, "主键ID"),
@@ -39,7 +39,8 @@ class TableMetadataController : Controller() {
             ).toObservable()
         )
     ).toObservable()
-
+*/
+    var tableInfos: ObservableList<TableMetadata> = observableListOf()
 
     init {
         val key = "tableInfos"
@@ -61,7 +62,8 @@ class TableMetadataController : Controller() {
 
         try {
             paths.forEach {
-                tableInfos.add(loadJsonModel<TableMetadata>(it))
+                val model = loadJsonModel<TableMetadata>(it)
+                tableInfos.add(model)
             }
         } catch (e: JsonException) {
             println(e)
@@ -70,7 +72,7 @@ class TableMetadataController : Controller() {
         //five sec save the data to local
         fixedRateTimer("Preferences save1", daemon = true, period = 5000) {
             tableInfos.forEach {
-                val newFilePath = parentFileDir.path + "/" + it.name
+                val newFilePath = parentFileDir.path + "/" + it.name + ".dat"
                 it.save(File(newFilePath).toPath())
                 println("save---$newFilePath")
             }

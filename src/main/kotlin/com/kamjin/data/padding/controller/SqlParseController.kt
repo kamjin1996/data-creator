@@ -1,5 +1,6 @@
 package com.kamjin.data.padding.controller
 
+import com.kamjin.data.padding.data.*
 import com.kamjin.data.padding.model.*
 import javafx.collections.*
 import tornadofx.*
@@ -38,7 +39,7 @@ class SqlParseController : Controller() {
     private val beReferenceColumnValues = mutableMapOf<String, MutableList<Any?>>()
 
     //be gen sql
-    private var currentSql: StringBuilder = StringBuilder("")
+    private var currentSql: StringBuilder = StringBuilder(String.EMPTY)
 
     /**
      * query be gen sql

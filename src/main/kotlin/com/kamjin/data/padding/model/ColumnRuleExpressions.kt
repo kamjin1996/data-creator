@@ -98,24 +98,24 @@ abstract class AbstractChainFilter<in T : Any> {
 }
 
 class InnerFunExpression(
-    var funInstance: InnerFun,
+    var funInstance: InnerFun?,
     var param: String?
 ) : ColumnRuleExpression {
 
     private val maker = Maker() //the column only one maker
 
     override fun exec(): String {
-        return funInstance(maker, param)
+        return funInstance?.invoke(maker, param) ?: String.EMPTY
     }
 }
 
 class NothingExpression : ColumnRuleExpression, ValueFilter, AbstractChainFilter<Any>() {
     override fun exec(): String {
-        return ""
+        return String.EMPTY
     }
 
     override fun filter(lastResult: Any?): Any {
-        return ""
+        return String.EMPTY
     }
 }
 
@@ -182,10 +182,13 @@ class SqlCodeExpression(var sql: String) :
  * create expressions role type
  */
 fun createExpressionsByRoleType(model: ColumnMetadata): ColumnRuleExpression? {
-    return when (ColumnConfigRoleEnum.valueOf(model.selectRule ?: return null )) {
+    return when (ColumnConfigRoleEnum.valueOf(model.selectRule ?: return null)) {
         ColumnConfigRoleEnum.doNoting -> NothingExpression()
         ColumnConfigRoleEnum.withOtherTableColumn -> OtherTableColumnExpression(model.otherTableColumnKey)
-        ColumnConfigRoleEnum.innerFun -> InnerFunExpression(model.ruleFun, model.ruleFunParam)
+        ColumnConfigRoleEnum.innerFun -> InnerFunExpression(
+            model.ruleFun ?: obtainInnerFunMap()[model.ruleFunName],
+            model.ruleFunParam
+        )
         ColumnConfigRoleEnum.custom -> model.customScriptFilters.map {
             val filters = when (it.type!!) {
                 ScriptType.UNKNOW -> NothingExpression()
@@ -205,6 +208,13 @@ fun createExpressionsByRoleType(model: ColumnMetadata): ColumnRuleExpression? {
         }.first()
     }
 }
+
+fun obtainInnerFunMap() = mapOf<String, InnerFun>(
+    "autoId" to { maker, param -> maker.autoId(param).toString() },
+    "choice" to { maker, param -> Maker.choice(param) },
+    "order" to { maker, param -> Maker().order(param).toString() },
+    "time" to { maker, param -> Maker().time(param).toString() }
+)
 
 fun main() {
 

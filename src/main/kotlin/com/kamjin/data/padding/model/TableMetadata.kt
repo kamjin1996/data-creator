@@ -27,8 +27,8 @@ enum class DbColumnType {
 
 class ColumnMetadata(
     tableName: String? = null,
-    name: String = "",
-    type: String = "",
+    name: String = String.EMPTY,
+    type: String = String.EMPTY,
     length: Int = 0,
     comment: String? = null,
 ) : Comparable<ColumnMetadata>, JsonModelAuto {
@@ -84,7 +84,7 @@ val ColumnMetadata.key: String
     get() = this.tableName + "." + this.name
 
 class TableMetadata(
-    name: String = "",
+    name: String = String.EMPTY,
     comment: String? = null,
     columnMetadata: ObservableList<ColumnMetadata> = observableListOf()
 ) :

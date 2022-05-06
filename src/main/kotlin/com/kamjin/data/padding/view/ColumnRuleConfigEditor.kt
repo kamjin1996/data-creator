@@ -33,13 +33,6 @@ class ColumnRuleConfigEditor : View() {
 
     private val sqlParseController = find<SqlParseController>()
 
-    private val innerFunMap = mapOf<String, InnerFun>(
-        "autoId" to { maker, param -> maker.autoId(param).toString() },
-        "choice" to { maker, param -> Maker.choice(param) },
-        "order" to { maker, param -> Maker().order(param).toString() },
-        "time" to { maker, param -> Maker().time(param).toString() }
-    )
-
     lateinit var innerFunCheckBox: ComboBox<String>
 
     private val model: ColumnRuleConfig by inject()
@@ -79,6 +72,7 @@ class ColumnRuleConfigEditor : View() {
                     }
 
                     vbox {
+                        val innerFunMap = obtainInnerFunMap()
                         innerFunCheckBox = combobox(property = model.ruleFunName, values = innerFunMap.keys.toList()) {
                             selectionModel.selectedItemProperty().addListener { obs, old, new ->
                                 model.ruleFunName.set(new)
