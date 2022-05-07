@@ -7,6 +7,15 @@ import javafx.collections.*
 import tornadofx.*
 import java.lang.StringBuilder
 
+//be referenced the other column
+//key: table.column
+//value is generated values
+private val beReferenceColumnValues = mutableMapOf<String, MutableList<Any?>>()
+
+fun queryNeedReferenceValuesByColumnKey(columnKey: String): List<Any?>? {
+    return beReferenceColumnValues[columnKey]
+}
+
 /**
  *
  *
@@ -18,26 +27,9 @@ import java.lang.StringBuilder
  */
 class SqlParseController : Controller() {
 
-    /**
-     * column expression saved cache
-     * key: table.column
-     */
-    private var columnExpressionMap = mutableMapOf<String, ColumnRuleExpression>()
-
     private val tableMetadataController = find<TableMetadataController>()
 
-    init {
-        tableMetadataController.queryAllTableInfos().flatMap { it.columnMetadatas }
-            .fold(columnExpressionMap) { acc, c ->
-                createExpressionsByRoleType(c)?.let { acc.put(c.key, it) }
-                acc
-            }
-    }
 
-    //be referenced the other column
-    //key: table.column
-    //value is generated values
-    private val beReferenceColumnValues = mutableMapOf<String, MutableList<Any?>>()
 
     //be gen sql
     private var currentSql: StringBuilder = StringBuilder(String.EMPTY)
@@ -47,17 +39,6 @@ class SqlParseController : Controller() {
      */
     fun queryCurrentSqls(): String {
         return currentSql.toString()
-    }
-
-    fun queryColumnRuleExpressionByKey(key: String): ColumnRuleExpression? {
-        return columnExpressionMap[key]
-    }
-
-    /**
-     * put for expressions
-     */
-    fun putColumnRuleExpression(key: String, e: ColumnRuleExpression) {
-        columnExpressionMap[key] = e
     }
 
     /**
@@ -91,7 +72,7 @@ class SqlParseController : Controller() {
                 } ) values ( ${
                     useColumnMetadata.map {
                         val key = it.key
-                        val expression = columnExpressionMap[key]
+                        val expression = queryExpression(key)
                         val result =
                             if (expression is AbstractChainFilter<*>) expression.chainFilter(null) else expression?.exec()
 
@@ -127,15 +108,17 @@ class SqlParseController : Controller() {
         currentSql.append(text)
     }
 
-    fun queryNeedReferenceValuesByColumnKey(columnKey: String): List<Any?>? {
-        return beReferenceColumnValues[columnKey]
-    }
-
     private fun obtainOrderTableMetadata(tableMetadata: ObservableList<TableMetadata>): List<TableMetadata> {
         return tableMetadata.distinct().sorted().apply {
             this.forEach {
                 it.columnMetadatas.sort()
             }
+        }
+    }
+
+    init {
+        tableMetadataController.queryAllTableInfos().flatMap { it.columnMetadatas }.forEach {
+            createExpressionsByRoleType(it)?.let { e -> putExpression(it.key, e) }
         }
     }
 }

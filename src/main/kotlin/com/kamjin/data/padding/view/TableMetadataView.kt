@@ -2,6 +2,7 @@ package com.kamjin.data.padding.view
 
 import com.kamjin.data.padding.controller.*
 import com.kamjin.data.padding.model.*
+import javafx.scene.layout.*
 import tornadofx.*
 
 /**

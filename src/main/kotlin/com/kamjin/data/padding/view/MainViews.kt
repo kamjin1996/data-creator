@@ -3,6 +3,7 @@ package com.kamjin.data.padding.view;
 import cn.hutool.core.io.*
 import com.kamjin.data.padding.controller.*
 import javafx.scene.control.*
+import javafx.scene.layout.*
 import javafx.stage.*
 import tornadofx.*
 import java.nio.charset.*
@@ -24,7 +25,6 @@ class Main : View("Main") {
 
 class LeftView : View() {
     override val root = borderpane {
-
         hbox(10) {
             left<TableMetadataView>()
             right<ColumnRuleConfigEditor>()

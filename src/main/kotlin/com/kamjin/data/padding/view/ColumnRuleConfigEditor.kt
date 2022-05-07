@@ -8,6 +8,7 @@ import javafx.beans.property.*
 import javafx.collections.*
 import javafx.scene.*
 import javafx.scene.control.*
+import javafx.scene.layout.*
 import javafx.stage.*
 import javafx.util.*
 import tornadofx.*
@@ -30,8 +31,6 @@ import tornadofx.setValue
  * 列规则editor
  */
 class ColumnRuleConfigEditor : View() {
-
-    private val sqlParseController = find<SqlParseController>()
 
     lateinit var innerFunCheckBox: ComboBox<String>
 
@@ -63,11 +62,9 @@ class ColumnRuleConfigEditor : View() {
 
                 text("规则：")
                 hbox(40) {
-                    vbox {
-                        ColumnConfigRoleEnum.values().map {
-                            radiobutton(it.desc, selectRuleToggleGroup).action {
-                                model.selectedRule.set(it.name)
-                            }
+                    vbox(10) {
+                        ColumnConfigRoleEnum.values().forEach {
+                            radiobutton(it.desc, selectRuleToggleGroup, it.name)
                         }
                     }
 
@@ -168,12 +165,13 @@ class ColumnRuleConfigEditor : View() {
                         //create expression by role type
                         val expression = createExpressionsByRoleType(model.item)
                         if (expression != null) {
-                            sqlParseController.putColumnRuleExpression(key, expression)
+                            putExpression(key, expression)
                         }
                     }
                 }
             }
         }
+        autosize()
     }
 }
 
@@ -194,8 +192,8 @@ enum class ScriptType {
 }
 
 enum class ColumnConfigRoleEnum(val desc: String) {
-    doNoting("doNothing"),
-    withOtherTableColumn("withOtherTableColumn"),
-    innerFun("innerFun"),
-    custom("custom")
+    doNoting("无需配置"),
+    withOtherTableColumn("其他表字段"),
+    innerFun("内置函数"),
+    custom("自定义")
 }

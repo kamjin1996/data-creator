@@ -45,6 +45,21 @@ class TableMetadataController : Controller() {
 */
     var tableInfos: ObservableList<TableMetadata> = observableListOf()
 
+    /**
+     * 查询所有表元数据信息
+     *
+     */
+    fun queryAllTableInfos(): ObservableList<TableMetadata> {
+        return tableInfos
+    }
+
+    fun queryTableBaseInfos(): List<TableBaseInfo> {
+        val dataSource = find<DataSourceConfigView>().obtainDataSourceWithTip() ?: return mutableListOf()
+        return Db.use(dataSource)
+            .query("select table_comment,table_name from information_schema.tables where table_schema = '${dataSource.connection?.catalog}'")
+            .map { TableBaseInfo(it.getStr("table_name"), it.getStr("table_comment")) }
+    }
+
     init {
         val key = "tableInfos"
 
@@ -80,20 +95,5 @@ class TableMetadataController : Controller() {
                 log.info("save---$newFilePath")
             }
         }
-    }
-
-    /**
-     * 查询所有表元数据信息
-     *
-     */
-    fun queryAllTableInfos(): ObservableList<TableMetadata> {
-        return tableInfos
-    }
-
-    fun queryTableBaseInfos(): List<TableBaseInfo> {
-        val dataSource = find<DataSourceConfigView>().obtainDataSourceWithTip() ?: return mutableListOf()
-        return Db.use(dataSource)
-            .query("select table_comment,table_name from information_schema.tables where table_schema = '${dataSource.connection?.catalog}'")
-            .map { TableBaseInfo(it.getStr("table_name"), it.getStr("table_comment")) }
     }
 }

@@ -120,11 +120,9 @@ class NothingExpression : ColumnRuleExpression, ValueFilter, AbstractChainFilter
 
 class OtherTableColumnExpression(var columnKey: String) : ColumnRuleExpression {
 
-    val sqlParseController = find<SqlParseController>()
-
     override fun exec(): String {
         //find values by key
-        val values = sqlParseController.queryNeedReferenceValuesByColumnKey(columnKey)
+        val values = queryNeedReferenceValuesByColumnKey(columnKey)
 
         //random select by values
         return values?.random().toString()
@@ -155,7 +153,7 @@ class SqlCodeExpression(var sql: String) :
     ColumnRuleExpression, ValueFilter, AbstractChainFilter<Any>() {
 
     private val dataSource: DataSource?
-        get() = find<DataSourceConfigView>().obtainDataSourceWithTip()
+        get() = find<DataSourceConfigView>().obtainDataSource()
 
     override fun exec(): String {
         return filter(null).toString()
@@ -214,6 +212,31 @@ fun obtainInnerFunMap() = mapOf<String, InnerFun>(
     "order" to { maker, param -> Maker().order(param).toString() },
     "time" to { maker, param -> Maker().time(param).toString() }
 )
+
+object ColumnRuleExpressionHandler {
+
+    /**
+     * column expression saved cache
+     * key: table.column
+     */
+    private var columnExpressionMap = mutableMapOf<String, ColumnRuleExpression>()
+
+    fun query(key: String): ColumnRuleExpression? {
+        return columnExpressionMap[key]
+    }
+
+    /**
+     * put for expressions
+     */
+    fun put(key: String, e: ColumnRuleExpression) {
+        columnExpressionMap[key] = e
+    }
+}
+
+fun putExpression(key: String, e: ColumnRuleExpression) = ColumnRuleExpressionHandler.put(key, e)
+
+fun queryExpression(key: String) = ColumnRuleExpressionHandler.query(key)
+
 
 fun main() {
 
