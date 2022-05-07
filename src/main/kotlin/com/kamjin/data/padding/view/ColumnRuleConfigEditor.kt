@@ -172,7 +172,7 @@ class ColumnRuleConfigEditor : View() {
                     }
 
                     //save Local cache
-                    tableMetadataController.saveAllLocalCache()
+                    tableMetadataController.saveLocalCache()
                 }
             }
         }

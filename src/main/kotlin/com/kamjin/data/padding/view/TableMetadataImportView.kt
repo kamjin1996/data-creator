@@ -38,9 +38,14 @@ class TableMetadataImportView : View() {
                     //begin import
                     val data = models.filter { it.selected.value == true }
                         .map { it.tableName.value }.let { TableMetadataHandler.import(it) }
+
                     if (data.isNotEmpty()) { // not empty,then clear
                         tableMetadataController.tableInfos.clear()
                         tableMetadataController.tableInfos.addAll(data)
+
+                        //clear cache and save new cache
+                        tableMetadataController.clearLocalCache()
+                        tableMetadataController.saveLocalCache()
                     }
                 }
 

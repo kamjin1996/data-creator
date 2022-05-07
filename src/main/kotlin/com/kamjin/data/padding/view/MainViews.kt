@@ -2,8 +2,6 @@ package com.kamjin.data.padding.view;
 
 import cn.hutool.core.io.*
 import com.kamjin.data.padding.controller.*
-import javafx.scene.control.*
-import javafx.scene.layout.*
 import javafx.stage.*
 import tornadofx.*
 import java.io.*
@@ -44,7 +42,7 @@ class TopView : View() {
         menubar {
             menu("元数据") {
                 item("导入元数据").action {
-                    confirm(header = "Config Handle", content = "确认导入新的元数据吗？当前配置将被覆盖，如需要请及时保存", title = "导入确认") {
+                    confirm(header = "导入确认", content = "确认导入新的元数据吗？当前配置将被覆盖，如需要请及时保存") {
                         openInternalWindow<TableMetadataImportView>()
                     }
                 }
@@ -53,7 +51,7 @@ class TopView : View() {
                     //covert to sql
                     //progress show
                     sqlParseController.convertModelToSql()
-                    information(header = "Convert Sql", content = "success")
+                    information(header = "转为SQL", content = "转换成功，即将导出..")
 
                     sqlExport()
                 }
@@ -63,7 +61,7 @@ class TopView : View() {
         menubar {
             menu("配置") {
                 item("导入配置").action {
-                    confirm(header = "Config Handle", content = "确认导入配置吗？当前配置将被覆盖，如需要请及时保存", title = "导入确认") {
+                    confirm(header = "导入确认", content = "确认导入配置吗？当前配置将被覆盖，如需要请及时保存") {
                         configImport()
                     }
                 }
@@ -99,7 +97,7 @@ class TopView : View() {
             title = "选择配置所在文件夹路径",
         ).let {
             if (it?.isDirectory != true) {
-                warning(header = "config load", content = "当前选择错误，请正确选择文件夹", title = "导入确认")
+                warning(header = "导入文件", content = "当前选择错误，请正确选择文件夹")
                 return
             }
             val configFiles = it.listFiles().filter { it.extension != CONFIG_EXTENTION }.toTypedArray()
@@ -117,14 +115,12 @@ class TopView : View() {
             title = "选择保存配置的路径",
         ).let {
             if (it?.isDirectory != true) {
-                warning(header = "config save", content = "当前选择错误，请正确选择文件夹")
+                warning(header = "导入文件", content = "当前选择错误，请正确选择文件夹")
                 return
             }
-            File(it.path + "/data-creator-" + System.currentTimeMillis()).apply {
-                if (!it.exists()) {
-                    it.mkdirs()
-                }
-            }.let { newDir -> find<TableMetadataController>().saveAllLocalCache(newDir) }
+            val newDir = File(it.path + "/data-creator-" + System.currentTimeMillis())
+            newDir.mkdirs()
+            find<TableMetadataController>().saveLocalCache(newDir)
         }
     }
 

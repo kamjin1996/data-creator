@@ -90,12 +90,21 @@ class TableMetadataController : Controller() {
         }
     }
 
-    fun saveAllLocalCache(dir: File = parentFileDir) {
+    fun saveLocalCache(dir: File = parentFileDir) {
+        if (!dir.exists()) warning("dir: $dir 该路径不存在")
         tableInfos.forEach {
-            val newFilePath = dir.path + "/" + it.name + CONFIG_EXTENTION
-            it.save(File(newFilePath).toPath())
-            log.info("save---$newFilePath")
+            val newFile = File(dir.path + "//" + it.name + CONFIG_EXTENTION).apply {
+                if (!this.exists()) {
+                    this.createNewFile()
+                }
+            }
+            it.save(newFile.toPath())
+            log.info("save---$newFile")
         }
+    }
+
+    fun clearLocalCache(dir: File = parentFileDir) {
+        dir.listFiles().forEach { it.delete() }
     }
 
     init {
