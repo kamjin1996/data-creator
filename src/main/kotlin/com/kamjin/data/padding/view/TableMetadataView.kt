@@ -2,7 +2,7 @@ package com.kamjin.data.padding.view
 
 import com.kamjin.data.padding.controller.*
 import com.kamjin.data.padding.model.*
-import javafx.scene.layout.*
+import javafx.scene.paint.*
 import tornadofx.*
 
 /**
@@ -26,6 +26,10 @@ class TableMetadataView : View() {
 
     override val root = vbox {
         tableview(tableMetadataController.queryAllTableInfos()) {
+            style {
+                setMinWidth(330.0)
+            }
+
             readonlyColumn("表名", TableMetadata::name)
             readonlyColumn("备注", TableMetadata::comment)
             rowExpander(expandOnDoubleClick = true) {
@@ -33,8 +37,16 @@ class TableMetadataView : View() {
                 tableview(it.columnMetadatas) {
                     readonlyColumn("列名", ColumnMetadata::name)
                     readonlyColumn("备注", ColumnMetadata::comment)
-                    readonlyColumn("类型", ColumnMetadata::type)
-                    readonlyColumn("长度", ColumnMetadata::length)
+                    readonlyColumn("规则", ColumnMetadata::selectRule) {
+                        cellFormat {
+                            this.text = this.item
+                            style {
+                                backgroundColor += c("#7BEA3A")
+                                textFill = Color.BLACK
+                            }
+                        }
+                    }
+
                     //model change
                     bindSelected(model)
 

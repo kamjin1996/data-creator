@@ -103,12 +103,7 @@ class DataSourceConfigView() : View() {
             model.user = get(_localCacheUserKey, "")
             model.password = get(_localCachePasswordKey, "")
             log.info("get local database cache, for model")
-            try {
-                _dataSource = SimpleDataSource(model.url, model.user, model.password)
-                log.info("connect success")
-            } catch (e: Exception) {
-                log.warning("local database cache to connect db error.. ${e.printStackTrace()}")
-            }
+            _dataSource = SimpleDataSource(model.url, model.user, model.password)
         }
     }
 
@@ -120,7 +115,7 @@ class DataSourceConfigView() : View() {
 
 class DataSourceStatusView : View() {
 
-    private val _dataSource by find<DataSourceConfigView>().obtainDataSource().toProperty()
+    private val _dataSource by find<DataSourceConfigView>().obtainDataSourceWithTip().toProperty()
 
     override val root = vbox(20) {
         //TODO css control style
