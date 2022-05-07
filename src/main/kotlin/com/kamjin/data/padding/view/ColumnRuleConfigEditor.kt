@@ -128,7 +128,7 @@ class ColumnRuleConfigEditor : View() {
             }
 
             //自定义多个过滤器获取内容 支持js和sql
-            vbox(10) {
+            vbox(10) scriptInputVbox@{
                 text("自定义过滤器：") {
                     addClass(TextStyle.title)
                 }
@@ -145,7 +145,7 @@ class ColumnRuleConfigEditor : View() {
                     val inputItem = ScriptInputItem()
                     customCodeFilters.add(inputItem)
 
-                    togglebutton {
+                    val theTogglebutton = togglebutton {
                         val stateText = selectedProperty().stringBinding {
                             val s = if (it == true) ScriptType.JS else ScriptType.SQL
                             inputItem.type = s
@@ -154,41 +154,51 @@ class ColumnRuleConfigEditor : View() {
                         textProperty().bind(stateText)
                     }
 
-                    //content
-                    textfield {
-                        textProperty().addListener { obs, old, new ->
-                            log.info("自定义过滤器 You typed: " + new)
+                    hbox scriptItemHbox@{
+                        //content
+                        val theScriptField = textfield {
+                            textProperty().addListener { obs, old, new ->
+                                log.info("自定义过滤器 You typed: " + new)
+                            }
+
+                            textProperty().bind(inputItem.scriptProperty)
                         }
 
-                        textProperty().bind(inputItem.scriptProperty)
+                        button("-") {
+                            action {
+                                //remove the filter
+                                this@scriptInputVbox.children.remove(theTogglebutton)
+                                this@scriptItemHbox.children.remove(theScriptField)
+                            }
+                        }
                     }
                 }
             }
-        }
 
-        buttonbar {
-            button("重置") {
-                model.rollback()
-            }
-            button("保存") {
-                enableWhen(model.dirty)
-                action {
-                    model.commit {
-                        //save customScriptFilters
-                        model.customScriptFilters.addAll(customCodeFilters)
+            buttonbar {
+                button("重置") {
+                    model.rollback()
+                }
+                button("保存") {
+                    enableWhen(model.dirty)
+                    action {
+                        model.commit {
+                            //save customScriptFilters
+                            model.customScriptFilters.addAll(customCodeFilters)
 
-                        //column key
-                        val key = model.item.key
+                            //column key
+                            val key = model.item.key
 
-                        //create expression by role type
-                        val expression = createExpressionsByRoleType(model.item)
-                        if (expression != null) {
-                            putExpression(key, expression)
+                            //create expression by role type
+                            val expression = createExpressionsByRoleType(model.item)
+                            if (expression != null) {
+                                putExpression(key, expression)
+                            }
                         }
-                    }
 
-                    //save Local cache
-                    tableMetadataController.saveLocalCache()
+                        //save Local cache
+                        tableMetadataController.saveLocalCache()
+                    }
                 }
             }
         }
