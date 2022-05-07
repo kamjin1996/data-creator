@@ -69,22 +69,25 @@ class SqlParseController : Controller() {
                 """insert into ${tableMetadata.name}( ${
                     useColumnMetadata.map { it.name }.joinToString(",")
                 } ) values ( ${
-                    useColumnMetadata.map {
+                    useColumnMetadata.map RESULT@{
                         val key = it.key
                         val expression = queryExpression(key)
                         val result =
                             if (expression is AbstractChainFilter<*>) expression.chainFilter(null) else expression?.exec()
 
-                        //if be referenced add to valuepool
+                        //if be referenced add to valuePool
                         if (needReferenceOtherTableColumnKeyList.contains(key)) {
                             val v = beReferenceColumnValues[key]
-                            if(v == null){
+                            if (v == null) {
                                 beReferenceColumnValues[key] = mutableListOf()
                             }
-
                             beReferenceColumnValues[key]?.add(result)
                         }
-                        result
+
+                        return@RESULT when (DbColumnType.valueOf(it.type)) {
+                            DbColumnType.int, DbColumnType.bigint -> result
+                            DbColumnType.datetime, DbColumnType.varchar, DbColumnType.tinyint -> "'$result'"
+                        }
                     }.joinToString(",")
                 } );"""
             }
