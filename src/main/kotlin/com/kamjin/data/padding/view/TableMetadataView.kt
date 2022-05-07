@@ -27,7 +27,8 @@ class TableMetadataView : View() {
     override val root = vbox {
         tableview(tableMetadataController.queryAllTableInfos()) {
             style {
-                setMinWidth(330.0)
+                setMinWidth(510.0)
+                setMinHeight(800.0)
             }
 
             readonlyColumn("表名", TableMetadata::name)

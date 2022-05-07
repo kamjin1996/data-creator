@@ -4,8 +4,10 @@ import cn.hutool.db.ds.simple.*
 import com.kamjin.data.padding.controller.*
 import com.kamjin.data.padding.data.*
 import com.kamjin.data.padding.model.*
+import com.kamjin.data.padding.style.*
 import javafx.beans.property.*
 import javafx.collections.*
+import javafx.geometry.*
 import javafx.scene.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
@@ -43,10 +45,18 @@ class ColumnRuleConfigEditor : View() {
     private val customCodeFilters: ObservableList<ScriptInputItem> = observableListOf()
 
     override val root = form {
+        style {
+            alignment = Pos.TOP_RIGHT
+            setMinWidth(510.0)
+            setMinHeight(800.0)
+        }
+
         vbox(30) {
             //列信息区
-            group {
-                text("列信息：")
+            hbox {
+                text("列信息：") {
+                    addClass(TextStyle.title)
+                }
                 hbox(20) {
                     text(model.tableName)
                     text(model.columnName)
@@ -57,12 +67,14 @@ class ColumnRuleConfigEditor : View() {
             }
 
             //规则选择 单选
-            group {
+            hbox {
 
                 //model rule
                 selectRuleToggleGroup.bind(model.selectedRule)
 
-                text("规则：")
+                text("规则：") {
+                    addClass(TextStyle.title)
+                }
                 hbox(40) {
                     vbox(10) {
                         ColumnConfigRoleEnum.values().forEach {
@@ -95,11 +107,13 @@ class ColumnRuleConfigEditor : View() {
             }
 
             //规则函数参数
-            group {
-                text("规则函数参数：")
+            hbox {
+                text("规则函数参数：") {
+                    addClass(TextStyle.title)
+                }
                 textarea(model.ruleFunParam) {
-                    maxHeight = 100.0
-                    maxWidth = 300.0
+                    maxHeight = 120.0
+                    maxWidth = 500.0
 
                     tooltip = Tooltip("rule method params,eg:['a','b','c']")
                     textProperty().addListener { obs, old, new ->
@@ -114,8 +128,10 @@ class ColumnRuleConfigEditor : View() {
             }
 
             //自定义多个过滤器获取内容 支持js和sql
-            group {
-                text("自定义过滤器：")
+            vbox(10) {
+                text("自定义过滤器：") {
+                    addClass(TextStyle.title)
+                }
                 button("+").action {
                     if (model.selectedRule.get() != ColumnConfigRoleEnum.custom.name) {
                         alert(
