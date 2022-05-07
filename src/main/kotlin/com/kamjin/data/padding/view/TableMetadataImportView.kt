@@ -3,6 +3,8 @@ package com.kamjin.data.padding.view
 import com.kamjin.data.padding.controller.*
 import com.kamjin.data.padding.data.*
 import javafx.beans.property.*
+import javafx.geometry.*
+import javafx.scene.control.*
 import tornadofx.*
 
 /**
@@ -15,24 +17,35 @@ import tornadofx.*
  */
 class TableMetadataImportView : View() {
 
-    val tableMetadataController = find<TableMetadataController>()
+    private val tableMetadataController = find<TableMetadataController>()
 
-    val models
+    private val models
         get() = tableMetadataController.queryTableBaseInfos().map { TableCheckBoxModel(it.tableName, false) }
+
+    private val allCheckBox = observableListOf<CheckBox>()
 
     override val root = vbox {
         flowpane {
+            paddingAll = insets.all
+            vgap = 5.0
+            hgap = 5.0
+
+            alignment = Pos.CENTER_LEFT
+
             models.forEach { model ->
                 checkbox {
                     textProperty().bind(model.tableName)
-                    selectedProperty().bind(model.selected)
-                }
+
+                    action {
+                        model.selected.set(isSelected)
+                    }
+                }.let { allCheckBox.add(it) }
             }
         }
 
         buttonbar {
-            button("select all") { action { models.forEach { it.selected.set(true) } } }
-            button("unSelect all") { action { models.forEach { it.selected.set(false) } } }
+            button("select all") { action { allCheckBox.forEach { it.selectedProperty().set(true) } } }
+            button("unSelect all") { action { allCheckBox.forEach { it.selectedProperty().set(false) } } }
             button("save") {
                 action {
                     //begin import

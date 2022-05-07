@@ -10,6 +10,7 @@ import tornadofx.*
 import java.util.regex.*
 import tornadofx.getValue
 import tornadofx.setValue
+import java.lang.Exception
 
 /**
  * <p>
@@ -41,9 +42,7 @@ object TableMetadataHandler {
                 this.comment = tableInfo.tableComment
                 val columnInfos = Db.use(dataSource).query("show full fields from ${tableInfo.tableName};")
                 this.columnMetadatas = columnInfos.map { columnInfo ->
-                    val length = columnInfo.getStr("Type").substringAfter("(").substringBefore(")")
-                        .let { if (it.isBlank()) null else it }
-                        ?.toInt()
+                    val length = deduceColumnValueLength(columnInfo.getStr("Type"))
                     ColumnMetadata(
                         tableName = tableInfo.tableName,
                         name = columnInfo.getStr("Field"),
@@ -54,6 +53,15 @@ object TableMetadataHandler {
                 }.toObservable()
             }
         }
+    }
+
+    private fun deduceColumnValueLength(originalDbType: String): Int? {
+        val mayLength = originalDbType.substringAfter("(").substringBefore(")")
+        try {
+            return mayLength.toInt()
+        } catch (e: Exception) {
+        }
+        return null
     }
 }
 
@@ -99,4 +107,9 @@ class TableBaseInfo(tableName: String, tableComment: String) {
     var tableComment by tableCommentProperty
     val tableNameProperty = SimpleStringProperty(tableName)
     var tableName by tableNameProperty
+}
+
+fun main() {
+    println("varchar(10)".substringAfter("(").substringBefore(")"))
+    println("datetime".substringAfter("(").substringBefore(")"))
 }
