@@ -6,6 +6,7 @@ import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.stage.*
 import tornadofx.*
+import java.io.*
 import java.nio.charset.*
 
 /**
@@ -74,6 +75,7 @@ class TopView : View() {
 
     fun sqlExport() {
         chooseFile(
+            initialDirectory = File(System.getProperty("user.home")),
             title = "export sql",
             mode = FileChooserMode.Save,
             filters = arrayOf(FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt"))

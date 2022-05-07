@@ -63,13 +63,11 @@ class Maker {
 
     }
 
-    companion object {
-        /**
-         * random choice
-         */
-        fun choice(param: String?): String {
-            return param?.split(",")?.random() ?: ""
-        }
+    /**
+     * random choice
+     */
+    fun choice(param: String?): String {
+        return param?.split(",")?.random() ?: ""
     }
 }
 

@@ -153,24 +153,13 @@ class SqlCodeExpression(var sql: String) :
     ColumnRuleExpression, ValueFilter, AbstractChainFilter<Any>() {
 
     private val dataSource: DataSource?
-        get() = find<DataSourceConfigView>().obtainDataSource()
+        get() = find<DataSourceConfigView>().obtainDataSourceWithTip()
 
     override fun exec(): String {
         return filter(null).toString()
     }
 
     override fun filter(lastResult: Any?): Any {
-        if (dataSource == null) {
-            alert(
-                type = Alert.AlertType.WARNING,
-                header = "datasource config",
-                content = "datasource config error,please correct config"
-            )
-            Platform.runLater {
-
-            }
-
-        }
         return DbUtil.use(dataSource).queryString(sql, lastResult)
     }
 }
@@ -208,9 +197,9 @@ fun createExpressionsByRoleType(model: ColumnMetadata): ColumnRuleExpression? {
 
 fun obtainInnerFunMap() = mapOf<String, InnerFun>(
     "autoId" to { maker, param -> maker.autoId(param).toString() },
-    "choice" to { maker, param -> Maker.choice(param) },
-    "order" to { maker, param -> Maker().order(param).toString() },
-    "time" to { maker, param -> Maker().time(param).toString() }
+    "choice" to { maker, param -> maker.choice(param) },
+    "order" to { maker, param -> maker.order(param).toString() },
+    "time" to { maker, param -> maker.time(param).toString() }
 )
 
 object ColumnRuleExpressionHandler {

@@ -34,7 +34,9 @@ class ColumnRuleConfigEditor : View() {
 
     lateinit var innerFunCheckBox: ComboBox<String>
 
-    private val model: ColumnRuleConfig by inject()
+    private val model by inject<ColumnRuleConfig>()
+
+    private val tableMetadataController by inject<TableMetadataController>()
 
     private val selectRuleToggleGroup = ToggleGroup()
 
@@ -168,10 +170,12 @@ class ColumnRuleConfigEditor : View() {
                             putExpression(key, expression)
                         }
                     }
+
+                    //save Local cache
+                    tableMetadataController.saveAllLocalCache()
                 }
             }
         }
-        autosize()
     }
 }
 

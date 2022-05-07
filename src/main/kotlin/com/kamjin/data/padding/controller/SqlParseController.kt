@@ -30,7 +30,6 @@ class SqlParseController : Controller() {
     private val tableMetadataController = find<TableMetadataController>()
 
 
-
     //be gen sql
     private var currentSql: StringBuilder = StringBuilder(String.EMPTY)
 
@@ -78,10 +77,12 @@ class SqlParseController : Controller() {
 
                         //if be referenced add to valuepool
                         if (needReferenceOtherTableColumnKeyList.contains(key)) {
-                            beReferenceColumnValues.computeIfPresent(key) { _, values ->
-                                values.add(result)
-                                values
+                            val v = beReferenceColumnValues[key]
+                            if(v == null){
+                                beReferenceColumnValues[key] = mutableListOf()
                             }
+
+                            beReferenceColumnValues[key]?.add(result)
                         }
                         result
                     }.joinToString(",")
