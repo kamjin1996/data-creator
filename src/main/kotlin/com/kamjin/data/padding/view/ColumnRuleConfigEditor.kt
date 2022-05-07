@@ -169,6 +169,7 @@ class ColumnRuleConfigEditor : View() {
                                 //remove the filter
                                 this@scriptInputVbox.children.remove(theTogglebutton)
                                 this@scriptItemHbox.children.remove(theScriptField)
+                                this@scriptItemHbox.children.remove(this)
                             }
                         }
                     }
