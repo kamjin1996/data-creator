@@ -42,7 +42,7 @@ class TopView : View() {
         //导入为导入某库的建表sql
         //导出为导出插入数据sql
         menubar {
-            menu("文件操作") {
+            menu("元数据") {
                 item("导入元数据").action {
                     confirm(header = "Config Handle", content = "确认导入新的元数据吗？当前配置将被覆盖，如需要请及时保存", title = "导入确认") {
                         openInternalWindow<TableMetadataImportView>()
@@ -61,7 +61,7 @@ class TopView : View() {
         }
 
         menubar {
-            menu {
+            menu("配置") {
                 item("导入配置").action {
                     confirm(header = "Config Handle", content = "确认导入配置吗？当前配置将被覆盖，如需要请及时保存", title = "导入确认") {
                         configImport()
