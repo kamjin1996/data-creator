@@ -43,17 +43,37 @@ class TopView : View() {
         //导出为导出插入数据sql
         menubar {
             menu("文件操作") {
-                item("导入").action {
-                    openInternalWindow<TableMetadataImportView>()
+                item("导入元数据").action {
+                    confirm(header = "Config Handle", content = "确认导入新的元数据吗？当前配置将被覆盖，如需要请及时保存", title = "导入确认") {
+                        openInternalWindow<TableMetadataImportView>()
+                    }
                 }
-                item("导出").action {
+
+                item("生成SQL导出").action {
                     //covert to sql
                     //progress show
                     sqlParseController.convertModelToSql()
-                    alert(header = "Convert Sql", content = "success", type = Alert.AlertType.INFORMATION)
+                    information(header = "Convert Sql", content = "success")
 
                     sqlExport()
                 }
+            }
+        }
+
+        menubar {
+            menu {
+                item("导入配置").action {
+                    confirm(header = "Config Handle", content = "确认导入配置吗？当前配置将被覆盖，如需要请及时保存", title = "导入确认") {
+                        configImport()
+                    }
+                }
+
+                item("当前配置导出") {
+                    action {
+                        configExport()
+                    }
+                }
+
             }
         }
 
@@ -70,6 +90,41 @@ class TopView : View() {
                     }
                 }
             }
+        }
+    }
+
+    fun configImport() {
+        chooseDirectory(
+            initialDirectory = File(System.getProperty("user.home")),
+            title = "选择配置所在文件夹路径",
+        ).let {
+            if (it?.isDirectory != true) {
+                warning(header = "config load", content = "当前选择错误，请正确选择文件夹", title = "导入确认")
+                return
+            }
+            val configFiles = it.listFiles().filter { it.extension != CONFIG_EXTENTION }.toTypedArray()
+            if (configFiles.isEmpty()) {
+                warning("${CONFIG_EXTENTION} 格式配置文件不存在")
+                return
+            }
+            find<TableMetadataController>().loadLocalCache(configFiles)
+        }
+    }
+
+    fun configExport() {
+        chooseDirectory(
+            initialDirectory = File(System.getProperty("user.home")),
+            title = "选择保存配置的路径",
+        ).let {
+            if (it?.isDirectory != true) {
+                warning(header = "config save", content = "当前选择错误，请正确选择文件夹")
+                return
+            }
+            File(it.path + "/data-creator-" + System.currentTimeMillis()).apply {
+                if (!it.exists()) {
+                    it.mkdirs()
+                }
+            }.let { newDir -> find<TableMetadataController>().saveAllLocalCache(newDir) }
         }
     }
 

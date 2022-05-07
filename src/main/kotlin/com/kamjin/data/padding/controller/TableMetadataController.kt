@@ -9,7 +9,8 @@ import tornadofx.*
 import java.io.*
 import java.nio.file.*
 import javax.json.*
-import kotlin.concurrent.*
+
+val CONFIG_EXTENTION = ".jdat"
 
 /**
  * <p>
@@ -48,7 +49,7 @@ class TableMetadataController : Controller() {
 
     val key = "tableInfos"
 
-    var paths = mutableListOf<Path>()
+    var configFiles: Array<File> = arrayOf()
 
     val parentFileDir = File("./$key")
         .apply {
@@ -59,7 +60,7 @@ class TableMetadataController : Controller() {
                     throw FileAlreadyExistsException("the path:$this not dir")
                 }
 
-                paths = this.listFiles().map { it.toPath() }.toMutableList()
+                configFiles = this.listFiles()
             }
         }
 
@@ -78,10 +79,10 @@ class TableMetadataController : Controller() {
             .map { TableBaseInfo(it.getStr("table_name"), it.getStr("table_comment")) }
     }
 
-    private fun loadLocalCache() {
+    fun loadLocalCache(configFiles: Array<File>) {
         try {
-            paths.forEach {
-                val model = loadJsonModel<TableMetadata>(it)
+            configFiles.forEach {
+                val model = loadJsonModel<TableMetadata>(it.path)
                 tableInfos.add(model)
             }
         } catch (e: JsonException) {
@@ -89,15 +90,15 @@ class TableMetadataController : Controller() {
         }
     }
 
-    fun saveAllLocalCache() {
+    fun saveAllLocalCache(dir: File = parentFileDir) {
         tableInfos.forEach {
-            val newFilePath = parentFileDir.path + "/" + it.name + ".dat"
+            val newFilePath = dir.path + "/" + it.name + CONFIG_EXTENTION
             it.save(File(newFilePath).toPath())
             log.info("save---$newFilePath")
         }
     }
 
     init {
-        loadLocalCache()
+        loadLocalCache(configFiles)
     }
 }
