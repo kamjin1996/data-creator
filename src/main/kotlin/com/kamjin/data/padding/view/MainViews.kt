@@ -2,6 +2,8 @@ package com.kamjin.data.padding.view;
 
 import cn.hutool.core.io.*
 import com.kamjin.data.padding.controller.*
+import javafx.scene.*
+import javafx.scene.input.*
 import javafx.stage.*
 import tornadofx.*
 import java.io.*
@@ -68,10 +70,29 @@ class TopView : View() {
 
                 item("当前配置导出") {
                     action {
-                        configExport()
+                        val remark = "".toProperty()
+
+                        //input config remark
+                        val tipView = object : View() {
+                            override val root = hbox tip@{
+                                text("remark:")
+                                textfield {
+                                    bind(remark)
+                                }
+                            }
+                        }
+
+                        tipView.openWindow()
+
+                        //on enter after export
+                        tipView.root.setOnKeyPressed {
+                            if (it.code == KeyCode.ENTER) {
+                                tipView.close() // close the view
+                                configExport(remark.get())
+                            }
+                        }
                     }
                 }
-
             }
         }
 
@@ -109,7 +130,7 @@ class TopView : View() {
         }
     }
 
-    fun configExport() {
+    fun configExport(remark: String? = "") {
         chooseDirectory(
             initialDirectory = File(System.getProperty("user.home")),
             title = "选择保存配置的路径",
@@ -118,7 +139,8 @@ class TopView : View() {
                 warning(header = "导入文件", content = "当前选择错误，请正确选择文件夹")
                 return
             }
-            val newDir = File(it.path + "/data-creator-" + System.currentTimeMillis())
+            val newDir =
+                File("${it.path}/${if (remark != null) "$remark-" else ""}config-${System.currentTimeMillis()}")
             newDir.mkdirs()
             find<TableMetadataController>().saveLocalCache(newDir)
         }
