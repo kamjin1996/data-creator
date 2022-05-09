@@ -2,7 +2,6 @@ package com.kamjin.data.padding.view
 
 import com.kamjin.data.padding.controller.*
 import com.kamjin.data.padding.model.*
-import com.kamjin.data.padding.style.*
 import javafx.scene.paint.*
 import tornadofx.*
 
@@ -27,13 +26,14 @@ class TableMetadataView : View() {
 
     override val root = vbox(20) {
         textflow {
-            text("当前配置文件所在目录：").addClass(TextStyle.title)
-            text() { bind(tableMetadataController.currentConfigDir) }
+            text("当前配置文件所在目录：")
+            text() { bind(tableMetadataController.currentUseConfigDir) }
         }
         tableview(tableMetadataController.queryAllTableInfos()) {
             style {
                 setMinWidth(510.0)
                 setMinHeight(800.0)
+                autosize()
             }
 
             readonlyColumn("表名", TableMetadata::name)

@@ -19,6 +19,7 @@ import javax.sql.*
 import kotlin.properties.*
 import tornadofx.getValue
 import tornadofx.setValue
+import java.io.*
 
 /**
  * <p>
@@ -67,7 +68,7 @@ class ColumnRuleConfigEditor : View() {
                     text(model.columnType)
                     text(" | ")
                     text(model.columnLength.asString())
-                }
+                }.hiddenWhen { model.columnName.isBlank() }
             }
 
             //规则选择 单选
@@ -203,6 +204,7 @@ class ColumnRuleConfigEditor : View() {
 
                         //save Local cache
                         tableMetadataController.saveLocalCache()
+                        tableMetadataController.saveLocalCache(File(tableMetadataController.currentUseConfigDir.get()))
                     }
                 }
             }

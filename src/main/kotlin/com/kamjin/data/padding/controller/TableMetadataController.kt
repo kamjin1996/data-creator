@@ -4,7 +4,6 @@ import cn.hutool.db.*
 import com.kamjin.data.padding.data.*
 import com.kamjin.data.padding.model.*
 import com.kamjin.data.padding.view.*
-import javafx.beans.property.*
 import javafx.collections.*
 import tornadofx.*
 import java.io.*
@@ -45,16 +44,15 @@ class TableMetadataController : Controller() {
 //            ).toObservable()
 //        )
 //    ).toObservable()
+    var currentUseConfigDir = stringProperty() //currentUseConfigDir
 
     var tableInfos: ObservableList<TableMetadata> = observableListOf()
 
-    var currentConfigDir = stringProperty() //currentConfigDir
+    private val key = "tableInfos"
 
-    val key = "tableInfos"
+    private var localConfigFiles: Array<File> = arrayOf()
 
-    var configFiles: Array<File> = arrayOf()
-
-    val parentFileDir = File("./$key")
+    private val localParentFileDir = File("./$key")
         .apply {
             if (!this.exists()) {
                 this.mkdirs()
@@ -63,7 +61,7 @@ class TableMetadataController : Controller() {
                     throw FileAlreadyExistsException("the path:$this not dir")
                 }
 
-                configFiles = this.listFiles()
+                localConfigFiles = this.listFiles()
             }
         }
 
@@ -88,13 +86,13 @@ class TableMetadataController : Controller() {
                 val model = loadJsonModel<TableMetadata>(it.toPath()) // !!! don't use file.path,the type is String
                 tableInfos.add(model)
             }
-            currentConfigDir.set(configFiles[0].parent)
+            currentUseConfigDir.set(configFiles[0].parent)
         } catch (e: JsonException) {
             log.warning(e.printStackTrace().toString())
         }
     }
 
-    fun saveLocalCache(dir: File = parentFileDir) {
+    fun saveLocalCache(dir: File = localParentFileDir) {
         if (!dir.exists()) warning("dir: $dir 该路径不存在")
         tableInfos.forEach {
             val newFile = File(dir.path + "//" + it.name + CONFIG_EXTENTION).apply {
@@ -107,11 +105,11 @@ class TableMetadataController : Controller() {
         }
     }
 
-    fun clearLocalCache(dir: File = parentFileDir) {
+    fun clearLocalCache(dir: File = localParentFileDir) {
         dir.listFiles().forEach { it.delete() }
     }
 
     init {
-        loadLocalCache(configFiles)
+        loadLocalCache(localConfigFiles)
     }
 }
