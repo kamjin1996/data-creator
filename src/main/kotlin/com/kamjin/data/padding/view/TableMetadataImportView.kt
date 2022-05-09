@@ -25,6 +25,7 @@ class TableMetadataImportView : View() {
     private val allCheckBox = observableListOf<CheckBox>()
 
     override val root = vbox {
+
         flowpane {
             paddingAll = insets.all
             vgap = 5.0
