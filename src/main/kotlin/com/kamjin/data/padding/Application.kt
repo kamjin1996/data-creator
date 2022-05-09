@@ -20,12 +20,10 @@ class Application : App(Main::class, TextStyle::class) {
         reloadStylesheetsOnFocus()
     }
 
-    lateinit var primaryScene: Scene
-
     override fun createPrimaryScene(view: UIComponent): Scene {
-        primaryScene = Scene(view.root)
-        JMetro(primaryScene, Style.LIGHT)
-        return primaryScene
+        return Scene(view.root).apply {
+            JMetro(this, Style.LIGHT)
+        }
     }
 }
 
