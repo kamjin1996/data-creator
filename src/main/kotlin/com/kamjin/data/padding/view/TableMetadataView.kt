@@ -2,6 +2,7 @@ package com.kamjin.data.padding.view
 
 import com.kamjin.data.padding.controller.*
 import com.kamjin.data.padding.model.*
+import javafx.scene.control.*
 import javafx.scene.paint.*
 import tornadofx.*
 import java.io.*
@@ -39,9 +40,6 @@ class TableMetadataView : View() {
                 bind(tableModel.recordCount)
 
                 setOnMouseExited {
-                    //rm focus
-                    focusTraversableProperty().set(false)
-
                     tableModel.commit() {
 
                         //save Local cache
@@ -83,6 +81,7 @@ class TableMetadataView : View() {
                     bindSelected(columnModel)
 
                     selectionModel.selectedItemProperty().onChange {
+                        refresh()
                         log.info("change ${it?.name}")
                     }
                 }

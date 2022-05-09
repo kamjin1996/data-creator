@@ -197,6 +197,7 @@ fun createExpressionsByRoleType(model: ColumnMetadata): ColumnRuleExpression? {
 
 fun obtainInnerFunMap() = mapOf<String, InnerFun>(
     "autoId" to { maker, param -> maker.autoId(param).toString() },
+    "formatAutoId" to { maker, param -> maker.formatAutoId(param) },
     "choice" to { maker, param -> maker.choice(param) },
     "order" to { maker, param -> maker.order(param).toString() },
     "time" to { maker, param -> maker.time(param).toString() }

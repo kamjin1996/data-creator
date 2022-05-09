@@ -29,6 +29,13 @@ class Maker {
         return this.i++
     }
 
+    fun formatAutoId(format: String?): String {
+        if (format != null) {
+            return String.format(format, i++)
+        }
+        return i++.toString()
+    }
+
     /**
      * order gen for: a,b,c
      */
@@ -70,3 +77,8 @@ class Maker {
 
 val String.Companion.EMPTY: String
     get() = ""
+
+fun main() {
+    println(String.format("adasd{}asdasda", 1))
+    println(String.format("ad%dasd%dasdasda", 213123123))
+}

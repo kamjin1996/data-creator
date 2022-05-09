@@ -7,9 +7,11 @@ import com.kamjin.data.padding.model.*
 import com.kamjin.data.padding.style.*
 import javafx.beans.property.*
 import javafx.collections.*
+import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.*
 import javafx.scene.control.*
+import javafx.scene.input.*
 import javafx.scene.layout.*
 import javafx.stage.*
 import javafx.util.*
@@ -44,6 +46,8 @@ class ColumnRuleConfigEditor : View() {
     private val selectRuleToggleGroup = ToggleGroup()
 
     private val customCodeFilters: ObservableList<ScriptInputItem> = observableListOf()
+
+    lateinit var paramTextProperty: StringProperty
 
     override val root = form {
         style {
@@ -87,15 +91,77 @@ class ColumnRuleConfigEditor : View() {
                         }
                     }
 
-                    vbox {
-                        val innerFunMap = obtainInnerFunMap()
-                        innerFunCheckBox = combobox(property = model.ruleFunName, values = innerFunMap.keys.toList()) {
-                            selectionModel.selectedItemProperty().addListener { obs, old, new ->
-                                model.ruleFunName.set(new)
-                                model.ruleFun.set(innerFunMap[new])
+                    text("快捷选择>>>").addClass(TextStyle.title)
+
+                    vbox(20) {
+                        hbox {
+                            text("内置函数选择：")
+                            val innerFunMap = obtainInnerFunMap()
+                            innerFunCheckBox =
+                                combobox(property = model.ruleFunName, values = innerFunMap.keys.toList()) {
+                                    selectionModel.selectedItemProperty().addListener { obs, old, new ->
+                                        model.ruleFunName.set(new)
+                                        model.ruleFun.set(innerFunMap[new])
+
+                                        //if the rule not select, auto select the innerFunRule
+                                        if (model.selectedRule.value != ColumnConfigRoleEnum.innerFun.name) {
+                                            model.selectedRule.set(ColumnConfigRoleEnum.innerFun.name)
+                                        }
+                                    }
+                                }
+                        }
+
+                        button("其他表字段选择") {
+                            val otherTableColumnMetadata = objectProperty<ColumnMetadata>()
+                            action {
+                                val selectOtherColumnView = object : View() {
+                                    private val allColumnMetadatas =
+                                        tableMetadataController.queryAllTableInfos().flatMap { it.columnMetadatas }
+
+                                    private val rootChilds = allColumnMetadatas
+                                        .map { it.tableName }
+                                        .distinct().map { ColumnMetadata(name = it, tableName = "") }
+
+                                    override val root = treeview<ColumnMetadata> tree@{
+                                        root = TreeItem(ColumnMetadata(name = "tables"))
+                                        cellFormat { text = it.name }
+                                        populate { parent ->
+                                            if (parent == root) rootChilds else allColumnMetadatas.filter { it.tableName == parent.value.name }
+                                        }
+
+                                        selectionModel.selectedItemProperty().onChange {
+                                            otherTableColumnMetadata.set(it?.value)
+                                        }
+                                    }
+                                }
+                                selectOtherColumnView.openWindow()
+
+                                selectOtherColumnView.root.childrenUnmodifiable.forEach { item ->
+                                    item.setOnMouseClicked {
+                                        if (it.clickCount == 2 && it.button.name == "PRIMARY") { //left button click twice
+                                            //set the textShow
+                                            val otherTableColumnKey = otherTableColumnMetadata.get().key
+                                            paramTextProperty.set(otherTableColumnKey)
+
+                                            //check and auto select the rule
+                                            if (model.selectedRule.get() != ColumnConfigRoleEnum.withOtherTableColumn.name) {
+                                                model.selectedRule.set(ColumnConfigRoleEnum.withOtherTableColumn.name)
+                                            }
+
+                                            //set value to model
+                                            model.otherTableColumnKey.set(otherTableColumnKey)
+
+                                            //close
+                                            selectOtherColumnView.close()
+                                        }
+                                    }
+                                }
                             }
                         }
+
                     }
+
+
                 }
 
                 //not innerFun selected dont show this
@@ -121,10 +187,13 @@ class ColumnRuleConfigEditor : View() {
                     maxWidth = 500.0
 
                     tooltip = Tooltip("rule method params,eg:['a','b','c']")
-                    textProperty().addListener { obs, old, new ->
+                    paramTextProperty = textProperty()
+                    paramTextProperty.addListener { obs, old, new ->
                         log.info("规则函数参数 You typed: $new")
 
                         model.ruleFunParam.set(new)
+
+                        //other table column key
                         if (model.selectedRule.get() == ColumnConfigRoleEnum.withOtherTableColumn.name) {
                             model.otherTableColumnKey.set(new)
                         }
