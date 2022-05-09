@@ -22,13 +22,21 @@ class TableMetadataView : View() {
 
     private val tableMetadataController = find(TableMetadataController::class)
 
-    val model: ColumnRuleConfig by inject()
+    val columnModel: ColumnRuleConfig by inject()
+
+    val tableModel: TableRuleConfig by inject()
 
     override val root = vbox(20) {
         textflow {
             text("当前配置文件所在目录：")
             text() { bind(tableMetadataController.currentUseConfigDir) }
         }
+
+        textflow {
+            text("默认条数：")
+            textfield() { }.bind(tableModel.recordCount)
+        }
+
         tableview(tableMetadataController.queryAllTableInfos()) {
             style {
                 setMinWidth(510.0)
@@ -38,6 +46,9 @@ class TableMetadataView : View() {
 
             readonlyColumn("表名", TableMetadata::name)
             readonlyColumn("备注", TableMetadata::comment)
+
+            bindSelected(tableModel)
+
             rowExpander(expandOnDoubleClick = true) {
                 paddingLeft = expanderColumn.width
                 tableview(it.columnMetadatas) {
@@ -54,7 +65,7 @@ class TableMetadataView : View() {
                     }
 
                     //model change
-                    bindSelected(model)
+                    bindSelected(columnModel)
 
                     selectionModel.selectedItemProperty().onChange {
                         log.info("change ${it?.name}")

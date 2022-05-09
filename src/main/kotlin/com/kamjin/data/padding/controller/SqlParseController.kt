@@ -56,8 +56,6 @@ class SqlParseController : Controller() {
         //order
         val ordered = obtainOrderTableMetadata(tableInfos)
 
-        //TODO 100 count
-
         //append sql and exec expressions by column metadata
         for (tableMetadata in ordered) {
             val useColumnMetadata =
@@ -65,7 +63,7 @@ class SqlParseController : Controller() {
 
             if (useColumnMetadata.isEmpty()) continue //the table not have config
 
-            val sqls = (1..1000).map {
+            val sqls = (1..tableMetadata.recordCount).map {
                 """insert into ${tableMetadata.name}( ${
                     useColumnMetadata.map { it.name }.joinToString(",")
                 } ) values ( ${

@@ -39,3 +39,8 @@ class ColumnRuleConfig : ItemViewModel<ColumnMetadata>() {
     val customScriptFilters = bind(ColumnMetadata::customScriptFiltersProperty)
 
 }
+
+class TableRuleConfig : ItemViewModel<TableMetadata>() {
+
+  val  recordCount = bind(TableMetadata::recordCountProperty)
+}

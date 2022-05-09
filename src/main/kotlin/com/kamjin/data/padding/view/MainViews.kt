@@ -1,6 +1,7 @@
 package com.kamjin.data.padding.view;
 
 import cn.hutool.core.io.*
+import com.kamjin.data.padding.*
 import com.kamjin.data.padding.controller.*
 import javafx.scene.*
 import javafx.scene.input.*
@@ -37,58 +38,78 @@ class TopView : View() {
 
     val sqlParseController = find<SqlParseController>()
 
-    override val root = hbox(5) {
-        //1个菜单项 包含导入导出
-        //导入为导入某库的建表sql
-        //导出为导出插入数据sql
-        menubar {
-            menu("元数据") {
-                item("导入元数据").action {
-                    confirm(header = "导入确认", content = "确认导入新的元数据吗？当前配置将被覆盖，如需要请及时保存") {
-                        openInternalWindow<TableMetadataImportView>()
+    override val root =
+        vbox {
+
+            hbox(5) {
+                //1个菜单项 包含导入导出
+                //导入为导入某库的建表sql
+                //导出为导出插入数据sql
+                menubar {
+                    menu("元数据") {
+                        item("导入元数据").action {
+                            confirm(header = "导入确认", content = "确认导入新的元数据吗？当前配置将被覆盖，如需要请及时保存") {
+                                openInternalWindow<TableMetadataImportView>()
+                            }
+                        }
+
+                        item("生成SQL导出").action {
+                            //covert to sql
+                            //progress show
+                            sqlParseController.convertModelToSql()
+                            information(header = "转为SQL", content = "转换成功，即将导出..")
+
+                            sqlExport()
+                        }
                     }
                 }
 
-                item("生成SQL导出").action {
-                    //covert to sql
-                    //progress show
-                    sqlParseController.convertModelToSql()
-                    information(header = "转为SQL", content = "转换成功，即将导出..")
+                menubar {
+                    menu("配置") {
+                        item("导入配置").action {
+                            confirm(header = "导入确认", content = "确认导入配置吗？当前配置将被覆盖，如需要请及时保存") {
+                                configImport()
+                            }
+                        }
 
-                    sqlExport()
-                }
-            }
-        }
+                        item("当前配置导出") {
+                            action {
+                                val remark = "".toProperty()
 
-        menubar {
-            menu("配置") {
-                item("导入配置").action {
-                    confirm(header = "导入确认", content = "确认导入配置吗？当前配置将被覆盖，如需要请及时保存") {
-                        configImport()
-                    }
-                }
+                                //input config remark
+                                val tipView = object : View() {
+                                    override val root = hbox tip@{
+                                        text("remark:")
+                                        textfield {
+                                            bind(remark)
+                                        }
+                                    }
+                                }
 
-                item("当前配置导出") {
-                    action {
-                        val remark = "".toProperty()
+                                tipView.openWindow()
 
-                        //input config remark
-                        val tipView = object : View() {
-                            override val root = hbox tip@{
-                                text("remark:")
-                                textfield {
-                                    bind(remark)
+                                //on enter after export
+                                tipView.root.setOnKeyPressed {
+                                    if (it.code == KeyCode.ENTER) {
+                                        tipView.close() // close the view
+                                        configExport(remark.get())
+                                    }
                                 }
                             }
                         }
+                    }
+                }
 
-                        tipView.openWindow()
-
-                        //on enter after export
-                        tipView.root.setOnKeyPressed {
-                            if (it.code == KeyCode.ENTER) {
-                                tipView.close() // close the view
-                                configExport(remark.get())
+                menubar {
+                    menu("数据源") {
+                        item("当前信息") {
+                            action {
+                                find<DataSourceStatusView>().openWindow()
+                            }
+                        }
+                        item("新建连接") {
+                            action {
+                                openInternalWindow<DataSourceConfigView>()
                             }
                         }
                     }
@@ -96,21 +117,6 @@ class TopView : View() {
             }
         }
 
-        menubar {
-            menu("数据源") {
-                item("当前信息") {
-                    action {
-                        find<DataSourceStatusView>().openWindow()
-                    }
-                }
-                item("新建连接") {
-                    action {
-                        openInternalWindow<DataSourceConfigView>()
-                    }
-                }
-            }
-        }
-    }
 
     fun configImport() {
         chooseDirectory(
