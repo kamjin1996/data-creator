@@ -46,7 +46,7 @@ object TableMetadataHandler {
                     ColumnMetadata(
                         tableName = tableInfo.tableName,
                         name = columnInfo.getStr("Field"),
-                        type = columnInfo.getStr("Type"),
+                        type = columnInfo.getStr("Type").substringBefore("("),
                         length = length,
                         comment = columnInfo.getStr("Comment")
                     )
@@ -110,6 +110,8 @@ class TableBaseInfo(tableName: String, tableComment: String) {
 }
 
 fun main() {
-    println("varchar(10)".substringAfter("(").substringBefore(")"))
-    println("datetime".substringAfter("(").substringBefore(")"))
+//    println("varchar(10)".substringAfter("(").substringBefore(")"))
+//    println("datetime".substringAfter("(").substringBefore(")"))
+        println("varchar(10)".substringBefore("("))
+    println("datetime".substringBefore("("))
 }

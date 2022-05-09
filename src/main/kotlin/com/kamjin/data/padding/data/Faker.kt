@@ -1,10 +1,7 @@
 package com.kamjin.data.padding.data
 
-import com.kamjin.data.padding.view.*
-import tornadofx.*
 import java.time.*
 import java.time.format.*
-import javax.sql.*
 
 typealias InnerFun = (Maker, String?) -> String
 
@@ -20,7 +17,7 @@ class Maker {
 
     var ins: Iterator<Any>? = null
 
-    var i = 0
+    var i = 1
 
     /**
      * id increment
@@ -35,11 +32,11 @@ class Maker {
     /**
      * order gen for: a,b,c
      */
-    fun order(param: String?): Any {
+    fun order(param: String?): Any? {
         if (ins == null) {
             ins = param?.split(",")?.iterator()
         }
-        return ins?.next() ?: String.EMPTY
+        return if (ins?.hasNext() == true) ins?.next() else String.EMPTY
     }
 
     /**

@@ -92,6 +92,10 @@ class TableMetadataController : Controller() {
         }
     }
 
+    fun saveUsedConfigCache() {
+        return saveLocalCache(File(currentUseConfigDir.get()))
+    }
+
     fun saveLocalCache(dir: File = localParentFileDir) {
         if (!dir.exists()) warning("dir: $dir 该路径不存在")
         tableInfos.forEach {
@@ -103,6 +107,7 @@ class TableMetadataController : Controller() {
             it.save(newFile.toPath())
             log.info("save---$newFile")
         }
+
     }
 
     fun clearLocalCache(dir: File = localParentFileDir) {

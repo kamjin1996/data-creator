@@ -204,7 +204,7 @@ class ColumnRuleConfigEditor : View() {
 
                         //save Local cache
                         tableMetadataController.saveLocalCache()
-                        tableMetadataController.saveLocalCache(File(tableMetadataController.currentUseConfigDir.get()))
+                        tableMetadataController.saveUsedConfigCache()
                     }
                 }
             }

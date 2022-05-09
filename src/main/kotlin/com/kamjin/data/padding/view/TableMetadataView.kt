@@ -4,6 +4,7 @@ import com.kamjin.data.padding.controller.*
 import com.kamjin.data.padding.model.*
 import javafx.scene.paint.*
 import tornadofx.*
+import java.io.*
 
 /**
  * <p>
@@ -34,7 +35,21 @@ class TableMetadataView : View() {
 
         textflow {
             text("默认条数：")
-            textfield() { }.bind(tableModel.recordCount)
+            textfield() {
+                bind(tableModel.recordCount)
+
+                setOnMouseExited {
+                    //rm focus
+                    focusTraversableProperty().set(false)
+
+                    tableModel.commit() {
+
+                        //save Local cache
+                        tableMetadataController.saveLocalCache()
+                        tableMetadataController.saveUsedConfigCache()
+                    }
+                }
+            }
         }
 
         tableview(tableMetadataController.queryAllTableInfos()) {

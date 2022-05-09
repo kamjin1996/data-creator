@@ -42,5 +42,9 @@ class ColumnRuleConfig : ItemViewModel<ColumnMetadata>() {
 
 class TableRuleConfig : ItemViewModel<TableMetadata>() {
 
-  val  recordCount = bind(TableMetadata::recordCountProperty)
+    val recordCount = bind(TableMetadata::recordCountProperty)
+
+    init {
+        recordCount.set(1000) //默认给1000
+    }
 }

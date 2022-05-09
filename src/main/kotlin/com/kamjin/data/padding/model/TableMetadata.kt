@@ -96,7 +96,7 @@ class TableMetadata(
     val nameProperty = SimpleStringProperty(name)
     var name by nameProperty
 
-    val recordCountProperty = SimpleIntegerProperty(1000)
+    val recordCountProperty = SimpleIntegerProperty()
     var recordCount by recordCountProperty
 
     val columnMetadatasProperty = SimpleObjectProperty<ObservableList<ColumnMetadata>>(columnMetadata)
