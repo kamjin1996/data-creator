@@ -4,6 +4,7 @@ import cn.hutool.db.*
 import com.kamjin.data.padding.data.*
 import com.kamjin.data.padding.model.*
 import com.kamjin.data.padding.view.*
+import javafx.beans.property.*
 import javafx.collections.*
 import tornadofx.*
 import java.io.*
@@ -47,6 +48,8 @@ class TableMetadataController : Controller() {
 
     var tableInfos: ObservableList<TableMetadata> = observableListOf()
 
+    var currentConfigDir = stringProperty() //currentConfigDir
+
     val key = "tableInfos"
 
     var configFiles: Array<File> = arrayOf()
@@ -85,6 +88,7 @@ class TableMetadataController : Controller() {
                 val model = loadJsonModel<TableMetadata>(it.toPath()) // !!! don't use file.path,the type is String
                 tableInfos.add(model)
             }
+            currentConfigDir.set(configFiles[0].parent)
         } catch (e: JsonException) {
             log.warning(e.printStackTrace().toString())
         }
