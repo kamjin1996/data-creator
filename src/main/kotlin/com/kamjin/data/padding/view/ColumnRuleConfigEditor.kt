@@ -57,11 +57,15 @@ class ColumnRuleConfigEditor : View() {
                 text("列信息：") {
                     addClass(TextStyle.title)
                 }
-                hbox(20) {
+                textflow() {
                     text(model.tableName)
+                    text(" | ")
                     text(model.columnName)
+                    text(" | ")
                     text(model.columnComment)
+                    text(" | ")
                     text(model.columnType)
+                    text(" | ")
                     text(model.columnLength.asString())
                 }
             }
@@ -157,8 +161,8 @@ class ColumnRuleConfigEditor : View() {
                     hbox scriptItemHbox@{
                         //content
                         val theScriptField = textfield {
-                            textProperty().addListener { obs, old, new ->
-                                log.info("自定义过滤器 You typed: " + new)
+                            textProperty().addListener { _, _, new ->
+                                log.info("自定义过滤器，当前值: $new")
                             }
 
                             textProperty().bind(inputItem.scriptProperty)

@@ -19,8 +19,7 @@ class TableMetadataImportView : View() {
 
     private val tableMetadataController = find<TableMetadataController>()
 
-    private val models
-        get() = tableMetadataController.queryTableBaseInfos().map { TableCheckBoxModel(it.tableName, false) }
+    private val models = observableListOf(tableMetadataController.queryTableBaseInfos().map { TableCheckBoxModel(it.tableName, false) })
 
     private val allCheckBox = observableListOf<CheckBox>()
 
