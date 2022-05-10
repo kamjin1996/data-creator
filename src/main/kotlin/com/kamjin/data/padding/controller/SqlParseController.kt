@@ -84,7 +84,7 @@ class SqlParseController : Controller() {
 
                         return@RESULT when (DbColumnType.valueOf(it.type)) {
                             DbColumnType.int, DbColumnType.bigint -> result
-                            DbColumnType.datetime, DbColumnType.varchar, DbColumnType.tinyint -> "'$result'"
+                            DbColumnType.datetime, DbColumnType.date, DbColumnType.varchar, DbColumnType.tinyint -> "'$result'"
                         }
                     }.joinToString(",")
                 } );"""

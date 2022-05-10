@@ -161,7 +161,7 @@ class ColumnRuleConfigEditor : View() {
                                 }
                             }
 
-                            checkbox(text = "是否不重复取值", model.otherTableColumnValueObtainUnique)
+                            checkbox(text = "不重复取值，值唯一", model.otherTableColumnValueObtainUnique)
                         }
 
                     }

@@ -23,6 +23,7 @@ enum class DbColumnType {
     int,
     tinyint,
     datetime,
+    date,
 }
 
 class ColumnMetadata(
