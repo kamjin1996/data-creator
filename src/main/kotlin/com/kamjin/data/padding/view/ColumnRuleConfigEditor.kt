@@ -147,22 +147,24 @@ class ColumnRuleConfigEditor : View() {
 
                                     selectOtherColumnView.root.childrenUnmodifiable.forEach { item ->
                                         item.setOnMouseClicked {
-                                            println(item.getChildList())
                                             if (it.clickCount == 2 && it.button.name == "PRIMARY") { //left button click twice
-                                                //set the textShow
-                                                val otherTableColumnKey = otherTableColumnMetadata.get().key
-                                                paramTextProperty.set(otherTableColumnKey)
+                                                val o = otherTableColumnMetadata.get()
+                                                if (!o.name.isNullOrBlank() && !o.tableName.isNullOrBlank()) { // assert is endedChild
+                                                    //set the textShow
+                                                    val otherTableColumnKey = o.key
+                                                    paramTextProperty.set(otherTableColumnKey)
 
-                                                //check and auto select the rule
-                                                if (model.selectedRule.get() != ColumnConfigRoleEnum.withOtherTableColumn.name) {
-                                                    model.selectedRule.set(ColumnConfigRoleEnum.withOtherTableColumn.name)
+                                                    //check and auto select the rule
+                                                    if (model.selectedRule.get() != ColumnConfigRoleEnum.withOtherTableColumn.name) {
+                                                        model.selectedRule.set(ColumnConfigRoleEnum.withOtherTableColumn.name)
+                                                    }
+
+                                                    //set value to model
+                                                    model.otherTableColumnKey.set(otherTableColumnKey)
+
+                                                    //close
+                                                    selectOtherColumnView.close()
                                                 }
-
-                                                //set value to model
-                                                model.otherTableColumnKey.set(otherTableColumnKey)
-
-                                                //close
-                                                selectOtherColumnView.close()
                                             }
                                         }
                                     }

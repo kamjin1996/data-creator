@@ -39,7 +39,7 @@ class TableMetadataView : View() {
         separator {  }
 
         textflow {
-            text("默认条数：")
+            text("生成条数：")
             textfield() {
                 bind(tableModel.recordCount)
 
