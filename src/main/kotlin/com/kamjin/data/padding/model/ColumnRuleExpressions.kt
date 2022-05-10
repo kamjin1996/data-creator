@@ -39,9 +39,6 @@ interface ValueFilter {
 
 abstract class AbstractChainFilter<in T : Any> {
 
-    /**
-     * 下一个filter
-     */
     var next: AbstractChainFilter<*>? = null
 
     /**
@@ -55,12 +52,6 @@ abstract class AbstractChainFilter<in T : Any> {
         return next!!
     }
 
-    /**
-     * 检查api是否可访问 递交
-     *
-     * @param request
-     * @return
-     */
     fun chainFilter(request: T?): Any? {
         val result = this.filter(request)
         return if (hasNext()) {
@@ -78,21 +69,10 @@ abstract class AbstractChainFilter<in T : Any> {
         return next as AbstractChainFilter<T>
     }
 
-    /**
-     * 是否有下一个
-     *
-     * @return
-     */
     fun hasNext(): Boolean {
         return Objects.nonNull(next)
     }
 
-    /**
-     * filter
-     *
-     * @param request
-     * @return
-     */
     abstract fun filter(request: T?): Any?
 }
 
@@ -118,14 +98,28 @@ class NothingExpression : ColumnRuleExpression, ValueFilter, AbstractChainFilter
     }
 }
 
-class OtherTableColumnExpression(var columnKey: String) : ColumnRuleExpression {
+class OtherTableColumnExpression(needUniqueObtain: Boolean, var columnKey: String) : ColumnRuleExpression {
+
+    private val values by lazy { queryNeedReferenceValuesByColumnKey(columnKey)?.toMutableList() }
+
+    private val obtainFun: () -> String by lazy {
+        if (needUniqueObtain) {
+            {
+                val random = values?.randomOrNull()
+                if (random != null) {
+                    values?.remove(random)
+                    random.toString()
+                } else {
+                    ""
+                }
+            }
+        } else {
+            { values?.random().toString() }
+        }
+    }
 
     override fun exec(): String {
-        //find values by key
-        val values = queryNeedReferenceValuesByColumnKey(columnKey)
-
-        //random select by values
-        return values?.random().toString()
+        return obtainFun.invoke()
     }
 }
 
@@ -133,19 +127,25 @@ class JsCodeExpression(var jsFunContext: String) :
     ColumnRuleExpression,
     ValueFilter, AbstractChainFilter<Any>() {
 
-    override fun exec(): String {
-        return filter(null).toString()
-    }
-
-    override fun filter(lastResult: Any?): Any? {
-        return ScriptUtil.eval(
-            """
+    private val contextFun = lazy {
+        { lastResult: Any? ->
+            ScriptUtil.compile(
+                """
             function a(result){
             $jsFunContext
             }
            a($lastResult)
         """.trimIndent()
-        )
+            ) //compile the script context
+        }
+    }
+
+    override fun exec(): String {
+        return filter(null).toString()
+    }
+
+    override fun filter(lastResult: Any?): Any? {
+        return contextFun.value.invoke(lastResult)
     }
 }
 
@@ -170,7 +170,10 @@ class SqlCodeExpression(var sql: String) :
 fun createExpressionsByRoleType(model: ColumnMetadata): ColumnRuleExpression? {
     return when (ColumnConfigRoleEnum.valueOf(model.selectRule ?: return null)) {
         ColumnConfigRoleEnum.doNoting -> NothingExpression()
-        ColumnConfigRoleEnum.withOtherTableColumn -> OtherTableColumnExpression(model.otherTableColumnKey)
+        ColumnConfigRoleEnum.withOtherTableColumn -> OtherTableColumnExpression(
+            model.otherTableColumnValueObtainUnique,
+            model.otherTableColumnKey
+        )
         ColumnConfigRoleEnum.innerFun -> InnerFunExpression(
             model.ruleFun ?: obtainInnerFunMap()[model.ruleFunName],
             model.ruleFunParam

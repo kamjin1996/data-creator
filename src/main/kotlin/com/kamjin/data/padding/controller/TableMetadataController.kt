@@ -93,7 +93,12 @@ class TableMetadataController : Controller() {
     }
 
     fun saveUsedConfigCache() {
-        return saveLocalCache(File(currentUseConfigDir.get()))
+        val path = currentUseConfigDir.get()
+        if (path.isNullOrBlank()) {
+            log.warning("used config path is null,ignore..")
+            return
+        }
+        return saveLocalCache(File(path))
     }
 
     fun saveLocalCache(dir: File = localParentFileDir) {
@@ -115,6 +120,10 @@ class TableMetadataController : Controller() {
     }
 
     init {
-        loadLocalCache(localConfigFiles)
+        try {
+            loadLocalCache(localConfigFiles)
+        } catch (e: Exception) {
+            log.warning("local cache load error: $${e.printStackTrace().toString()}")
+        }
     }
 }

@@ -63,6 +63,9 @@ class ColumnMetadata(
     val otherTableColumnKeyProperty = SimpleStringProperty()
     var otherTableColumnKey by otherTableColumnKeyProperty
 
+    val otherTableColumnValueObtainUniqueProperty = SimpleBooleanProperty()
+    var otherTableColumnValueObtainUnique by otherTableColumnValueObtainUniqueProperty
+
     val customScriptFiltersProperty = SimpleListProperty<ScriptInputItem>(observableListOf())
     var customScriptFilters by customScriptFiltersProperty
 

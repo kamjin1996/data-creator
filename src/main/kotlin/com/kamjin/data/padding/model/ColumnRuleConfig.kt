@@ -36,6 +36,8 @@ class ColumnRuleConfig : ItemViewModel<ColumnMetadata>() {
 
     val otherTableColumnKey = bind(ColumnMetadata::otherTableColumnKeyProperty)
 
+    val otherTableColumnValueObtainUnique = bind(ColumnMetadata::otherTableColumnValueObtainUniqueProperty)
+
     val customScriptFilters = bind(ColumnMetadata::customScriptFiltersProperty)
 
 }

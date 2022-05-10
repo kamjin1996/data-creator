@@ -111,52 +111,57 @@ class ColumnRuleConfigEditor : View() {
                                 }
                         }
 
-                        button("其他表字段选择") {
-                            val otherTableColumnMetadata = objectProperty<ColumnMetadata>()
-                            action {
-                                val selectOtherColumnView = object : View() {
-                                    private val allColumnMetadatas =
-                                        tableMetadataController.queryAllTableInfos().flatMap { it.columnMetadatas }
+                        hbox {
+                            button("其他表字段选择") {
+                                val otherTableColumnMetadata = objectProperty<ColumnMetadata>()
+                                action {
+                                    val selectOtherColumnView = object : View() {
+                                        private val allColumnMetadatas =
+                                            tableMetadataController.queryAllTableInfos().flatMap { it.columnMetadatas }
 
-                                    private val rootChilds = allColumnMetadatas
-                                        .map { it.tableName }
-                                        .distinct().map { ColumnMetadata(name = it, tableName = "") }
+                                        private val rootChilds = allColumnMetadatas
+                                            .map { it.tableName }
+                                            .distinct().map { ColumnMetadata(name = it, tableName = "") }
 
-                                    override val root = treeview<ColumnMetadata> tree@{
-                                        root = TreeItem(ColumnMetadata(name = "tables"))
-                                        cellFormat { text = it.name }
-                                        populate { parent ->
-                                            if (parent == root) rootChilds else allColumnMetadatas.filter { it.tableName == parent.value.name }
-                                        }
-
-                                        selectionModel.selectedItemProperty().onChange {
-                                            otherTableColumnMetadata.set(it?.value)
-                                        }
-                                    }
-                                }
-                                selectOtherColumnView.openWindow()
-
-                                selectOtherColumnView.root.childrenUnmodifiable.forEach { item ->
-                                    item.setOnMouseClicked {
-                                        if (it.clickCount == 2 && it.button.name == "PRIMARY") { //left button click twice
-                                            //set the textShow
-                                            val otherTableColumnKey = otherTableColumnMetadata.get().key
-                                            paramTextProperty.set(otherTableColumnKey)
-
-                                            //check and auto select the rule
-                                            if (model.selectedRule.get() != ColumnConfigRoleEnum.withOtherTableColumn.name) {
-                                                model.selectedRule.set(ColumnConfigRoleEnum.withOtherTableColumn.name)
+                                        override val root = treeview<ColumnMetadata> tree@{
+                                            root = TreeItem(ColumnMetadata(name = "tables"))
+                                            cellFormat { text = it.name }
+                                            populate { parent ->
+                                                if (parent == root) rootChilds else allColumnMetadatas.filter { it.tableName == parent.value.name }
                                             }
 
-                                            //set value to model
-                                            model.otherTableColumnKey.set(otherTableColumnKey)
+                                            selectionModel.selectedItemProperty().onChange {
+                                                otherTableColumnMetadata.set(it?.value)
+                                            }
+                                        }
+                                    }
+                                    selectOtherColumnView.openWindow()
 
-                                            //close
-                                            selectOtherColumnView.close()
+                                    selectOtherColumnView.root.childrenUnmodifiable.forEach { item ->
+                                        item.setOnMouseClicked {
+                                            item.getChildList().let { println(it) }
+                                            if (it.clickCount == 2 && it.button.name == "PRIMARY") { //left button click twice
+                                                //set the textShow
+                                                val otherTableColumnKey = otherTableColumnMetadata.get().key
+                                                paramTextProperty.set(otherTableColumnKey)
+
+                                                //check and auto select the rule
+                                                if (model.selectedRule.get() != ColumnConfigRoleEnum.withOtherTableColumn.name) {
+                                                    model.selectedRule.set(ColumnConfigRoleEnum.withOtherTableColumn.name)
+                                                }
+
+                                                //set value to model
+                                                model.otherTableColumnKey.set(otherTableColumnKey)
+
+                                                //close
+                                                selectOtherColumnView.close()
+                                            }
                                         }
                                     }
                                 }
                             }
+
+                            checkbox(text = "是否不重复取值", model.otherTableColumnValueObtainUnique)
                         }
 
                     }

@@ -127,7 +127,7 @@ class TopView : View() {
                 warning(header = "导入文件", content = "当前选择错误，请正确选择文件夹")
                 return
             }
-            val configFiles = it.listFiles().filter { it.extension != CONFIG_EXTENTION }.toTypedArray()
+            val configFiles = it.listFiles().filter { it.isFile }.filter { it.extension != CONFIG_EXTENTION }.toTypedArray()
             if (configFiles.isEmpty()) {
                 warning("${CONFIG_EXTENTION} 格式配置文件不存在")
                 return
