@@ -29,21 +29,27 @@ class SqlParseController : Controller() {
 
     private val tableMetadataController = find<TableMetadataController>()
 
-
     //be gen sql
-    private var currentSql: StringBuilder = StringBuilder(String.EMPTY)
+    private var currentCreateSql: StringBuilder = StringBuilder(String.EMPTY)
+    private var currentTruncateSql: StringBuilder = StringBuilder(String.EMPTY)
 
-    /**
-     * query be gen sql
-     */
-    fun queryCurrentSqls(): String {
-        return currentSql.toString()
+    fun queryCurrentCreateSqls() = currentCreateSql.toString()
+
+    fun queryCurrentTruncateSqls() = currentTruncateSql.toString()
+
+    fun convertTheTruncateSql() {
+        //obtain table metadata
+        val tableInfos = this.tableMetadataController.queryAllTableInfos()
+
+        tableInfos.forEach {
+            append(currentTruncateSql, """truncate ${it.name};""")
+        }
     }
 
     /**
-     * covertModelToSql
+     * covertModelToCreateSql
      */
-    fun convertModelToSql() {
+    fun convertModelToCreateSql() {
         //obtain table metadata
         val tableInfos = this.tableMetadataController.queryAllTableInfos()
 
@@ -89,25 +95,25 @@ class SqlParseController : Controller() {
                     }.joinToString(",")
                 } );"""
             }
-            this.append(sqls)
+            this.append(currentCreateSql, sqls)
         }
     }
 
     /**
      * append sqlContents
      */
-    private fun append(texts: List<String>) {
-        texts.forEach { this.append(it) }
+    private fun append(sqlSb: StringBuilder, texts: List<String>) {
+        texts.forEach { this.append(sqlSb, it) }
     }
 
     /**
      * append to sqlContent
      */
-    private fun append(text: String) {
-        if (currentSql.toString().isNotBlank()) {
-            currentSql.append("\n")
+    private fun append(sqlSb: StringBuilder, text: String) {
+        if (sqlSb.toString().isNotBlank()) {
+            sqlSb.append("\n")
         }
-        currentSql.append(text)
+        sqlSb.append(text)
     }
 
     private fun obtainOrderTableMetadata(tableMetadata: ObservableList<TableMetadata>): List<TableMetadata> {

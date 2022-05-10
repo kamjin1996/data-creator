@@ -61,10 +61,13 @@ class TopView : View() {
                         item("生成SQL导出").action {
                             //covert to sql
                             //progress show
-                            sqlParseController.convertModelToSql()
-                            information(header = "转为SQL", content = "转换成功，即将导出..")
+                            sqlParseController.convertModelToCreateSql()
+                            sqlParseController.convertTheTruncateSql()
+                            information(header = "转为SQL", content = "转换成功，即将导出【插入语句】及【相关表清数据语句】脚本")
 
-                            sqlExport()
+                            val time = System.currentTimeMillis()
+                            createSqlExport("create-dc-${time}")
+                            truncateSqlExport("truncate-dc-${time}")
                             information(header = "转为SQL", content = "导出成功！")
                         }
                     }
@@ -159,20 +162,40 @@ class TopView : View() {
         }
     }
 
-    fun sqlExport() {
+    private fun createSqlExport(fileName: String) {
+        fileExport(
+            "create sql export",
+            arrayOf(FileChooser.ExtensionFilter("Sql Script File (*.sql)", "*.sql")),
+            initFileName = "$fileName.sql", sqlParseController.queryCurrentCreateSqls()
+        )
+    }
+
+    private fun truncateSqlExport(fileName: String) {
+        fileExport(
+            "truncate sql export",
+            arrayOf(FileChooser.ExtensionFilter("Sql Script File (*.sql)", "*.sql")),
+            initFileName = "$fileName.sql", sqlParseController.queryCurrentTruncateSqls()
+        )
+    }
+
+    private fun fileExport(
+        title: String = "file export",
+        filters: Array<out FileChooser.ExtensionFilter>,
+        initFileName: String,
+        fileContent: String
+    ) {
         chooseFile(
             initialDirectory = File(System.getProperty("user.home")),
-            title = "export sql",
+            title = title,
             mode = FileChooserMode.Save,
-            filters = arrayOf(FileChooser.ExtensionFilter("Sql Script File (*.sql)", "*.sql"))
+            filters = filters
         ) {
-            initialFileName = "dc-${System.currentTimeMillis()}.sql"
+            initialFileName = initFileName
         }.let {
             if (it.isEmpty()) {
                 return
             }
-            val sqls = sqlParseController.queryCurrentSqls()
-            it[0].let { FileUtil.writeString(sqls, it, StandardCharsets.UTF_8.name()) }
+            it[0].let { FileUtil.writeString(fileContent, it, StandardCharsets.UTF_8.name()) }
         }
     }
 }
