@@ -3,6 +3,7 @@ package com.kamjin.data.padding.view;
 import cn.hutool.core.io.*
 import com.kamjin.data.padding.*
 import com.kamjin.data.padding.controller.*
+import javafx.application.*
 import javafx.scene.*
 import javafx.scene.input.*
 import javafx.stage.*
@@ -22,6 +23,10 @@ class Main : View("Main") {
     override val root = borderpane {
         top<TopView>()
         left<LeftView>()
+    }
+
+    init {
+        Platform.runLater { root.requestFocus() } //boot first time， not should selected any control
     }
 }
 
@@ -127,7 +132,8 @@ class TopView : View() {
                 warning(header = "导入文件", content = "当前选择错误，请正确选择文件夹")
                 return
             }
-            val configFiles = it.listFiles().filter { it.isFile }.filter { it.extension != CONFIG_EXTENTION }.toTypedArray()
+            val configFiles =
+                it.listFiles().filter { it.isFile }.filter { it.extension != CONFIG_EXTENTION }.toTypedArray()
             if (configFiles.isEmpty()) {
                 warning("${CONFIG_EXTENTION} 格式配置文件不存在")
                 return
