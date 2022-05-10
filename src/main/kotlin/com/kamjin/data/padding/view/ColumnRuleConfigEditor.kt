@@ -147,7 +147,7 @@ class ColumnRuleConfigEditor : View() {
 
                                     selectOtherColumnView.root.childrenUnmodifiable.forEach { item ->
                                         item.setOnMouseClicked {
-                                            item.getChildList().let { println(it) }
+                                            println(item.getChildList())
                                             if (it.clickCount == 2 && it.button.name == "PRIMARY") { //left button click twice
                                                 //set the textShow
                                                 val otherTableColumnKey = otherTableColumnMetadata.get().key

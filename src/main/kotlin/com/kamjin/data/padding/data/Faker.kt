@@ -1,6 +1,7 @@
 package com.kamjin.data.padding.data
 
 import java.time.*
+import java.time.LocalDateTime.*
 import java.time.format.*
 
 typealias InnerFun = (Maker, String?) -> String
@@ -63,8 +64,22 @@ class Maker {
         //获取两个时间的随机数
         val difference = (Math.random() * (end - start)).toLong();
         //生成时间
-        return LocalDateTime.ofEpochSecond(start + difference, 0, ZoneOffset.ofHours(8));
+        return LocalDateTime.ofEpochSecond(start + difference, 0, ZoneOffset.ofHours(8))
+    }
 
+    fun date(param: String?): LocalDate {
+        if (param == null) {
+            return LocalDate.now()
+        }
+        val split = param.split("~").map { LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy-MM-dd")) }
+
+        //将两个时间转为时间戳
+        val start: Long = split[0].toEpochDay()
+        val end: Long = split[1].toEpochDay()
+        //获取两个时间的随机数
+        val difference = (Math.random() * (end - start)).toLong();
+        //生成时间
+        return LocalDate.ofEpochDay(start + difference)
     }
 
     /**
