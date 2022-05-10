@@ -48,7 +48,7 @@ class TableMetadataController : Controller() {
 
     var tableInfos: ObservableList<TableMetadata> = observableListOf()
 
-    private val key = "tableInfos"
+    private val key = "dcConf"
 
     private var localConfigFiles: Array<File> = arrayOf()
 

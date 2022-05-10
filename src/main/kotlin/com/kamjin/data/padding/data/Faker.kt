@@ -67,6 +67,11 @@ class Maker {
         return LocalDateTime.ofEpochSecond(start + difference, 0, ZoneOffset.ofHours(8))
     }
 
+    /**
+     * not input the nowDate
+     * else random for duration
+     * input format:    2020-11-20~2021-11-20
+     */
     fun date(param: String?): LocalDate {
         if (param == null) {
             return LocalDate.now()

@@ -135,7 +135,7 @@ class TopView : View() {
             val configFiles =
                 it.listFiles().filter { it.isFile }.filter { it.extension != CONFIG_EXTENTION }.toTypedArray()
             if (configFiles.isEmpty()) {
-                warning("${CONFIG_EXTENTION} 格式配置文件不存在")
+                warning("$CONFIG_EXTENTION 格式配置文件不存在")
                 return
             }
             find<TableMetadataController>().loadLocalCache(configFiles)
@@ -152,7 +152,7 @@ class TopView : View() {
                 return
             }
             val newDir =
-                File("${it.path}/${if (remark != null) "$remark-" else ""}config-${System.currentTimeMillis()}")
+                File("${it.path}/${if (remark != null) "$remark-" else ""}dcConf-${System.currentTimeMillis()}")
             newDir.mkdirs()
             find<TableMetadataController>().saveLocalCache(newDir)
         }
@@ -163,8 +163,10 @@ class TopView : View() {
             initialDirectory = File(System.getProperty("user.home")),
             title = "export sql",
             mode = FileChooserMode.Save,
-            filters = arrayOf(FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt"))
-        ).let {
+            filters = arrayOf(FileChooser.ExtensionFilter("Sql Script File (*.sql)", "*.sql"))
+        ) {
+            initialFileName = "dc-${System.currentTimeMillis()}.sql"
+        }.let {
             if (it.isEmpty()) {
                 return
             }
