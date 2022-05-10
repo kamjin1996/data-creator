@@ -65,6 +65,7 @@ class TopView : View() {
                             information(header = "转为SQL", content = "转换成功，即将导出..")
 
                             sqlExport()
+                            information(header = "转为SQL", content = "导出成功！")
                         }
                     }
                 }
