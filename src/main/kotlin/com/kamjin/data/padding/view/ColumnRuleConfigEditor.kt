@@ -119,7 +119,8 @@ class ColumnRuleConfigEditor : View() {
                         separator {}
 
                         hbox(10) {
-                            button("其他表字段选择") {
+                            text("其他表字段：")
+                            button("选择") {
                                 val otherTableColumnMetadata = objectProperty<ColumnMetadata>()
                                 action {
                                     val selectOtherColumnView = object : View() {
@@ -170,10 +171,7 @@ class ColumnRuleConfigEditor : View() {
 
                             checkbox(text = "不重复取值（唯一）", model.otherTableColumnValueObtainUnique)
                         }
-
                     }
-
-
                 }
 
                 //not innerFun selected dont show this
