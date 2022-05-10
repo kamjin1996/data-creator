@@ -29,10 +29,14 @@ class TableMetadataView : View() {
     val tableModel: TableRuleConfig by inject()
 
     override val root = vbox(20) {
+        separator {  }
+
         textflow {
             text("当前配置文件所在目录：")
             text() { bind(tableMetadataController.currentUseConfigDir) }
         }
+
+        separator {  }
 
         textflow {
             text("默认条数：")

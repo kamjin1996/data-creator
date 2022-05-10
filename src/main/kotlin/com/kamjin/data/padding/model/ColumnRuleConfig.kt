@@ -47,6 +47,6 @@ class TableRuleConfig : ItemViewModel<TableMetadata>() {
     val recordCount = bind(TableMetadata::recordCountProperty)
 
     init {
-        recordCount.set(1000) //默认给1000
+        recordCount.set(100) //default
     }
 }

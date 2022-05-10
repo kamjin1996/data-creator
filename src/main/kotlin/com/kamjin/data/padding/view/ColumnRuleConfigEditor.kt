@@ -52,7 +52,7 @@ class ColumnRuleConfigEditor : View() {
     override val root = form {
         style {
             alignment = Pos.TOP_RIGHT
-            setMinWidth(510.0)
+            setMinWidth(540.0)
             setMinHeight(800.0)
         }
 
@@ -75,6 +75,8 @@ class ColumnRuleConfigEditor : View() {
                 }.hiddenWhen { model.columnName.isBlank() }
             }
 
+            separator { }
+
             //规则选择 单选
             hbox {
 
@@ -84,6 +86,7 @@ class ColumnRuleConfigEditor : View() {
                 text("规则：") {
                     addClass(TextStyle.title)
                 }
+
                 hbox(40) {
                     vbox(10) {
                         ColumnConfigRoleEnum.values().forEach {
@@ -91,9 +94,11 @@ class ColumnRuleConfigEditor : View() {
                         }
                     }
 
+                    separator(Orientation.VERTICAL) { }
+
                     text("快捷选择>>>").addClass(TextStyle.title)
 
-                    vbox(20) {
+                    vbox(30) {
                         hbox {
                             text("内置函数选择：")
                             val innerFunMap = obtainInnerFunMap()
@@ -111,7 +116,9 @@ class ColumnRuleConfigEditor : View() {
                                 }
                         }
 
-                        hbox {
+                        separator {}
+
+                        hbox(10) {
                             button("其他表字段选择") {
                                 val otherTableColumnMetadata = objectProperty<ColumnMetadata>()
                                 action {
@@ -182,6 +189,8 @@ class ColumnRuleConfigEditor : View() {
                 }
             }
 
+            separator { }
+
             //规则函数参数
             hbox {
                 text("规则函数参数：") {
@@ -205,6 +214,8 @@ class ColumnRuleConfigEditor : View() {
                     }
                 }
             }
+
+            separator { }
 
             //自定义多个过滤器获取内容 支持js和sql
             vbox(10) scriptInputVbox@{
@@ -254,6 +265,8 @@ class ColumnRuleConfigEditor : View() {
                     }
                 }
             }
+
+            separator()
 
             buttonbar {
                 button("重置") {
