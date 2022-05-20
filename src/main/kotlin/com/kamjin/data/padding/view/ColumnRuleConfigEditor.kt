@@ -173,6 +173,18 @@ class ColumnRuleConfigEditor : View() {
 
                             checkbox(text = "不重复取值（唯一）", model.otherTableColumnValueObtainUnique)
                         }
+
+                        separator { }
+
+                        hbox {
+                            text("函数体执行内容：")
+                            textarea {
+                                tooltip("eg:faker.randomInt()")
+                                prefHeight = 70.0
+                                prefWidth = 320.0
+
+                            }
+                        }
                     }
                 }
 
@@ -197,8 +209,8 @@ class ColumnRuleConfigEditor : View() {
                     addClass(TextStyle.title)
                 }
                 textarea(model.ruleFunParam) {
-                    maxHeight = 120.0
-                    maxWidth = 500.0
+                    prefHeight = 100.0
+                    prefWidth = 500.0
 
                     tooltip = Tooltip("rule method params,eg:['a','b','c']")
                     paramTextProperty = textProperty()
@@ -319,5 +331,6 @@ enum class ColumnConfigRoleEnum(val desc: String) {
     doNoting("无需配置"),
     withOtherTableColumn("其他表字段"),
     innerFun("内置函数"),
+    funContextCall("函数体执行(上下文可用对象包含：faker)"),
     custom("自定义")
 }

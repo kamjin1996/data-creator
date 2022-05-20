@@ -88,6 +88,15 @@ class InnerFunExpression(
     }
 }
 
+class FunContextCallExpression() : ColumnRuleExpression {
+
+    //
+
+    override fun exec(): String {
+        TODO("js faker call")
+    }
+}
+
 class NothingExpression : ColumnRuleExpression, ValueFilter, AbstractChainFilter<Any>() {
     override fun exec(): String {
         return String.EMPTY
@@ -178,6 +187,7 @@ fun createExpressionsByRoleType(model: ColumnMetadata): ColumnRuleExpression? {
             model.ruleFun ?: obtainInnerFunMap()[model.ruleFunName],
             model.ruleFunParam
         )
+        ColumnConfigRoleEnum.funContextCall -> TODO("fun context call")
         ColumnConfigRoleEnum.custom -> model.customScriptFilters.map {
             val filters = when (it.type!!) {
                 ScriptType.UNKNOW -> NothingExpression()
